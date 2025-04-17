@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신호등 모니터링 - 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .popup-slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+<!-- 네비게이션 바 -->
+<nav class="bg-white shadow-lg fixed w-full z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex items-center">
+                <h1 class="text-2xl font-extrabold text-gray-800">스마트 모니터링</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a th:href="@{/trafficLight/dashboard}" class="text-gray-600 hover:text-blue-500 font-semibold">대시보드</a>
+                <a th:href="@{/trafficLight/trafficList}" class="text-gray-600 hover:text-blue-500">신호등 목록</a>
+                <a th:href="@{/user/logout}" class="text-gray-600 hover:text-blue-500">로그아웃</a>
+            </div>
+        </div>
+    </div>
+</nav>
+<main th:replace="${main}"></main>
+</body>
+</html>
