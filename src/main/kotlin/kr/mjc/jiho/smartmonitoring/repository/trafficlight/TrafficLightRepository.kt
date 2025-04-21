@@ -9,7 +9,17 @@ import org.springframework.data.repository.query.Param
 
 interface TrafficLightRepository : JpaRepository<TrafficLight, String> {
 
-    fun findByIdnStartingWith(cName: String, pageable: Pageable): Slice<TrafficLight>
 
+
+
+    @Query("SELECT t FROM TrafficLight t WHERE t.id.cid = :cid")
+    fun findByCid(@Param("cid") cid: Long, pageable: Pageable): Slice<TrafficLight>
+
+
+    @Query("SELECT t FROM TrafficLight t WHERE t.id.cid = :cid AND t.state = 1")
+    fun findEmergencyLOC(cid:Long): TrafficLight?
+
+    @Query("SELECT t FROM TrafficLight t WHERE t.id.id = :id AND t.id.cid = :cid")
+    fun findByIdCid(id : Long, cid: Long) : TrafficLight?
 
 }

@@ -85,25 +85,39 @@
     <button onclick="closePopup()" class="mt-4 bg-white text-red-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100">닫기</button>
 </div>
 
-<script>
+    <script th:inline="javascript">
+    var id = /*[[${emergencyLoc.id.id}]]*/ 'TL001';
+    var status = /*[[${emergencyLoc.state}]]*/ '0';
+    var cid = /*[[${emergencyLoc.id.cid}]]*/ '은평구';
+    var lat = /*[[${emergencyLoc.lat}]]*/ '37.5665';
+    var lng = /*[[${emergencyLoc.lng}]]*/ '126.9780';
     // Leaflet.js 지도 초기화
-    const map = L.map('map').setView([37.5665, 126.9780], 11); // 서울 중심
+    const map = L.map('map').setView([lat, lng], 15);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
     // 신호등 데이터 (위급 상태만 표시)
     const trafficLights = [
-        { id: 'TL001', lat: 37.5985, lng: 126.9151, status: '정상', district: '은평구' },
-        { id: 'TL002', lat: 37.5647, lng: 126.9751, status: '위급', district: '종로구' },
-        { id: 'TL003', lat: 37.5587, lng: 126.9367, status: '위급', district: '서대문구' },
+        { id: id, lat: lat, lng: lng, status: status, district: cid }
     ];
 
     trafficLights
-        .filter(light => light.status === '위급')
+        .filter(light => light.status ==='1')
         .forEach(light => {
             L.circleMarker([light.lat, light.lng], {
                 color: 'red',
+                radius: 8,
+            })
+                .addTo(map)
+                .bindPopup(`<a href="traffic-detail.html?id=${light.id}">${light.id}</a> - ${light.status} (${light.district})`)
+                .on('click', () => window.location.href = `traffic-detail.html?id=${light.id}`);
+        });
+    trafficLights
+        .filter(light => light.status ==='0')
+        .forEach(light => {
+            L.circleMarker([light.lat, light.lng], {
+                color: 'green',
                 radius: 8,
             })
                 .addTo(map)

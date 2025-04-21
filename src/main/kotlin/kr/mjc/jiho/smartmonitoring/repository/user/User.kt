@@ -1,6 +1,6 @@
 package kr.mjc.jiho.smartmonitoring.repository.user
 import jakarta.persistence.*
-import kr.mjc.jiho.smartmonitoring.repository.Constituency
+import kr.mjc.jiho.smartmonitoring.repository.constituency.Constituency
 import java.io.Serializable
 
 @Entity
@@ -10,9 +10,9 @@ class User : Serializable {
     lateinit var username: String
     lateinit var password: String
     @ManyToOne
-    @JoinColumn(name = "c_name") lateinit var constituency: Constituency
+    @JoinColumn(name = "constituency_id") lateinit var constituencyId: Constituency
 
 
     override fun toString(): String =
-        "User(id=$id, username='$username', constituency=$constituency)"
+        "User(id=$id, username='$username', constituencyId=$constituencyId)"
 }

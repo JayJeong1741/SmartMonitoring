@@ -30,7 +30,6 @@ class UserController(val userRepository: UserRepository,
 
         if(user != null && passwordEncoder.matches(password,user.password)){
             session.setAttribute("user", user)
-            session.setAttribute("constituency", user.constituency)
             return "redirect:$LANDING_PAGE"
         }else{
             return "redirect:/user/signup?error"
