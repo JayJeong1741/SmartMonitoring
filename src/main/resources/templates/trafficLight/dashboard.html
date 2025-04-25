@@ -32,15 +32,15 @@
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
         <div class="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 class="text-lg font-semibold text-gray-700">정상</h3>
-            <p class="text-3xl font-bold text-green-600">45</p>
+            <p class="text-3xl font-bold text-green-600" th:text="${normalState}">45</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md text-center">
-            <h3 class="text-lg font-semibold text-gray-700">위급</h3>
-            <p class="text-3xl font-bold text-red-600">2</p>
+            <h3 class="text-lg font-semibold text-gray-700" >위급</h3>
+            <p class="text-3xl font-bold text-red-600" th:text="${emergencyState}">2</p>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md text-center">
             <h3 class="text-lg font-semibold text-gray-700">점검 중</h3>
-            <p class="text-3xl font-bold text-yellow-600">3</p>
+            <p class="text-3xl font-bold text-yellow-600" th:text="${inspectionState}">3</p>
         </div>
     </div>
 
@@ -86,44 +86,53 @@
 </div>
 
     <script th:inline="javascript">
-    var id = /*[[${emergencyLoc.id.id}]]*/ 'TL001';
-    var cid = /*[[${emergencyLoc.id.cid}]]*/ '은평구';
-    var status = /*[[${emergencyLoc.state}]]*/ '0';
-    var lat = /*[[${emergencyLoc.lat}]]*/ '37.5665';
-    var lng = /*[[${emergencyLoc.lng}]]*/ '126.9780';
-    // Leaflet.js 지도 초기화
-    const map = L.map('map').setView([lat, lng], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(map);
+        const map = L.map('map').setView([37.5665, 126.9780], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+        }).addTo(map);
 
-    // 신호등 데이터 (위급 상태만 표시)
-    const trafficLights = [
-        { id: id, lat: lat, lng: lng, status: status, district: cid }
-    ];
+        let markers = []; // 기존 마커 저장용
 
-    trafficLights
-        .filter(light => light.status ==='1')
-        .forEach(light => {
-            L.circleMarker([light.lat, light.lng], {
-                color: 'red',
-                radius: 8,
-            })
-                .addTo(map)
-                .bindPopup(`<a href="traffic-detail.html?id=${light.id}">${light.id}</a> - ${light.status} (${light.district})`)
-                .on('click', () => window.location.href = `traffic-detail.html?id=${light.id}`);
-        });
-    trafficLights
-        .filter(light => light.status ==='0')
-        .forEach(light => {
-            L.circleMarker([light.lat, light.lng], {
-                color: 'green',
-                radius: 8,
-            })
-                .addTo(map)
-                .bindPopup(`<a href="traffic-detail.html?id=${light.id}">${light.id}</a> - ${light.status} (${light.district})`)
-                .on('click', () => window.location.href = `traffic-detail.html?id=${light.id}`);
-        });
+        // 마커 초기 렌더링 (Thymeleaf에서 렌더된 값)
+        const trafficLights = /*[[${emergencyLocList}]]*/ [];
+
+        function renderMarkers(lights) {
+            // 기존 마커 제거
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+
+            lights.forEach(light => {
+                const markerOptions = {
+                    color: light.state === 1 ? 'red' : 'green',
+                    radius: 8,
+                };
+
+                const marker = L.circleMarker([light.lat, light.lng], markerOptions)
+                    .addTo(map)
+                    .on('click', () => {
+                        window.location.href = `/main/trafficLight/trafficDetail?id=${light.id.id}&cid=${light.id.cid}`;
+                    });
+
+                markers.push(marker);
+            });
+        }
+
+        // 초기 렌더링
+        if (trafficLights.length > 0) {
+            map.setView([trafficLights[0].lat, trafficLights[0].lng], 12);
+            renderMarkers(trafficLights);
+        }
+
+        // 주기적으로 서버에서 신호등 데이터를 받아와 갱신
+        function fetchTrafficLights() {
+            fetch('/main/api/emergency_traffic_lights')  // JSON 형태의 API 필요
+                .then(res => res.json())
+                .then(data => {
+                    renderMarkers(data);
+                });
+        }
+
+        setInterval(fetchTrafficLights, 5000); // 5초마다 갱신
 
     // Chart.js 막대 그래프 초기화
     const ctx = document.getElementById('statusChart').getContext('2d');

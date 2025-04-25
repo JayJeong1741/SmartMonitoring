@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.SessionAttribute
 
 
@@ -21,15 +22,18 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
     }
 
     @GetMapping("/trafficLight/dashboard")
-    fun dashboard(@SessionAttribute user: User, model: Model){
+    fun dashboard(@SessionAttribute user: User, model: Model) {
+        val cid: Long? = user.constituencyId.id
 
-        val cid:Long? = user.constituencyId.id
-        println("cid:"+cid)
-
-        if(cid != null){
-            val emergencyLoc: TrafficLight? = trafficLightRepository.findEmergencyLOC(cid)
-            println("traffic_light:" + emergencyLoc)
-            model.addAttribute("emergencyLoc", emergencyLoc)
+        println("cid: $cid")
+        if (cid != null) {
+            val normalState: Int = trafficLightRepository.countTrafficLightNormal(cid)
+            val emergencyState: Int = trafficLightRepository.countTrafficLightEmergency(cid)
+            val inspectionState: Int = trafficLightRepository.countTrafficLightInspection(cid)
+            model.addAttribute("normalState", normalState)
+            model.addAttribute("emergencyState", emergencyState)
+            model.addAttribute("inspectionState", inspectionState)
+            model.addAttribute("emergencyLocList", trafficLightRepository.findEmergencyLOC(cid))
         }
     }
 
@@ -55,4 +59,13 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
         println("나오나? : " + trafficLight)
         model.addAttribute("trafficLight", trafficLight)
     }
+
+    @GetMapping("/api/emergency_traffic_lights")
+    @ResponseBody
+    fun getTrafficLights(@SessionAttribute user:User): List<TrafficLight?>? {
+        val cid = user.constituencyId.id
+
+        return cid?.let { trafficLightRepository.findEmergencyLOC(it) }
+    }
+
 }

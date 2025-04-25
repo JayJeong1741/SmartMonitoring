@@ -17,6 +17,6 @@ class TrafficLight {
     var lastEmergency: LocalDateTime? = null // datetime, nullable
 
     override fun toString(): String {
-        return "Post(idn=${id.id}, cid=${id.cid}, sName='$sName', lat='$lat', lng=$lng, state=$state, lastEmergency=$lastEmergency)"
+        return "TrafficLight(idn=${id.id}, cid=${id.cid}, sName='$sName', lat='$lat', lng=$lng, state=$state, lastEmergency=$lastEmergency)"
     }
 }
