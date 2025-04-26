@@ -35,13 +35,16 @@ class UserController(val userRepository: UserRepository,
             return "redirect:/user/signup?error"
         }
     }
+    @GetMapping("/user/login")
+    fun login():String{
+        return "redirect:/"
+    }
 
     @PostMapping("/user/logout")
     fun logout(session: HttpSession):String{
         session.invalidate()
         return "redirect:/"
     }
-
     @PostMapping("/user/signup")
     fun signup(user: User, session: HttpSession): String {
         val exists = userRepository.existsByUsername(user.username)

@@ -1,0 +1,23 @@
+<p class="flex justify-center space-x-2 mt-8">
+  <a th:if="${not trafficLights.isFirst}"
+     href="?page=0"
+     class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">
+    First
+  </a>
+
+  <a th:if="${not trafficLights.isFirst}"
+     th:href="|?page=${trafficLights.number - 1}|"
+     class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">
+    Prev
+  </a>
+
+  <span class="flex items-center px-4 py-1 text-gray-700">
+    Page <span th:text="${trafficLights.number}" class="font-bold ml-1"></span>
+  </span>
+
+  <a th:if="${not trafficLights.isLast}"
+     th:href="|?page=${trafficLights.number + 1}|"
+     class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition">
+    Next
+  </a>
+</p>

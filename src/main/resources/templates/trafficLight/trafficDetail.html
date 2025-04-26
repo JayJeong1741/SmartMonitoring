@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html th:replace="~{layouts/base::html(main=~{::main})}"> lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,21 +9,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 <body class="bg-gray-100 font-sans">
+<main>
 <!-- 네비게이션 바 -->
-<nav class="bg-white shadow-lg fixed w-full z-10">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex items-center">
-                <h1 class="text-2xl font-extrabold text-gray-800">스마트 모니터링</h1>
-            </div>
-            <div class="flex items-center space-x-4">
-                <a th:href="@{/trafficLight/dashboard}" class="text-gray-600 hover:text-blue-500 font-semibold">대시보드</a>
-                <a th:href="@{/trafficLight/trafficList}" class="text-gray-600 hover:text-blue-500">신호등 목록</a>
-                <a th:href="@{/user/logout}" class="text-gray-600 hover:text-blue-500">로그아웃</a>
-            </div>
-        </div>
-    </div>
-</nav>
+
 
 <!-- 신호등 상세 정보 -->
 <section class="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"  th:each="trafficLight : ${trafficLight}">
@@ -144,6 +132,6 @@
     });
 </script>
 
-
+</main>
 </body>
 </html>

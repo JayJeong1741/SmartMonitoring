@@ -25,7 +25,6 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
     fun dashboard(@SessionAttribute user: User, model: Model) {
         val cid: Long? = user.constituencyId.id
 
-        println("cid: $cid")
         if (cid != null) {
             val normalState: Int = trafficLightRepository.countTrafficLightNormal(cid)
             val emergencyState: Int = trafficLightRepository.countTrafficLightEmergency(cid)
@@ -34,6 +33,8 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
             model.addAttribute("emergencyState", emergencyState)
             model.addAttribute("inspectionState", inspectionState)
             model.addAttribute("emergencyLocList", trafficLightRepository.findEmergencyLOC(cid))
+            model.addAttribute("emergencyCount", trafficLightRepository.emergencyCountByCid(cid))
+            println("data" + trafficLightRepository.emergencyCountByCid(cid))
         }
     }
 

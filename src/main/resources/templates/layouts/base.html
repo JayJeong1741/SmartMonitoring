@@ -27,6 +27,7 @@
                 <h1 class="text-2xl font-extrabold text-gray-800">스마트 모니터링</h1>
             </div>
             <div class="flex items-center space-x-4">
+                <a th:if="${session.user}" th:text="${session.user.constituencyId.cNameH}"></a>
                 <a th:href="@{/trafficLight/dashboard}" class="text-gray-600 hover:text-blue-500 font-semibold">대시보드</a>
                 <a th:href="@{/trafficLight/trafficList}" class="text-gray-600 hover:text-blue-500">신호등 목록</a>
                 <form th:action="@{/user/logout}" method="post"><button type="submit">Logout</button></form>

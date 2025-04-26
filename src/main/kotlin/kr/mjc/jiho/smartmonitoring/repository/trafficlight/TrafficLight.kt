@@ -15,8 +15,10 @@ class TrafficLight {
     lateinit var sName: String
     var state: Int? = null // int, nullable
     var lastEmergency: LocalDateTime? = null // datetime, nullable
+    var emergencyCount: Int = 0;
 
     override fun toString(): String {
-        return "TrafficLight(idn=${id.id}, cid=${id.cid}, sName='$sName', lat='$lat', lng=$lng, state=$state, lastEmergency=$lastEmergency)"
+        return "TrafficLight(idn=${id.id}, cid=${id.cid}, sName='$sName', lat='$lat', lng=$lng, state=$state, lastEmergency=$lastEmergency," +
+                "emergency_count=${emergencyCount})"
     }
 }

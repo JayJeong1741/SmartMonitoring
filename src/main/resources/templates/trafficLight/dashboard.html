@@ -71,7 +71,7 @@
 
             <!-- 통계 차트 -->
             <div class="bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">📊 구별 위급 상황 횟수 (오늘)</h3>
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">📊위급상황 빈도 상위 지역(금일)</h3>
                 <canvas id="statusChart" class="w-full"></canvas>
             </div>
         </div>
@@ -95,6 +95,7 @@
 
         // 마커 초기 렌더링 (Thymeleaf에서 렌더된 값)
         const trafficLights = /*[[${emergencyLocList}]]*/ [];
+        console.log("loc : " + trafficLights)
 
         function renderMarkers(lights) {
             // 기존 마커 제거
@@ -116,13 +117,11 @@
                 markers.push(marker);
             });
         }
-
         // 초기 렌더링
         if (trafficLights.length > 0) {
             map.setView([trafficLights[0].lat, trafficLights[0].lng], 12);
             renderMarkers(trafficLights);
         }
-
         // 주기적으로 서버에서 신호등 데이터를 받아와 갱신
         function fetchTrafficLights() {
             fetch('/main/api/emergency_traffic_lights')  // JSON 형태의 API 필요
@@ -134,16 +133,32 @@
 
         setInterval(fetchTrafficLights, 5000); // 5초마다 갱신
 
+
+
     // Chart.js 막대 그래프 초기화
     const ctx = document.getElementById('statusChart').getContext('2d');
+    const emergencyCount =  /*[[${emergencyCount}]]*/ [];
+    console.log("ㅇㄴ릉니 : " + JSON.stringify(emergencyCount))
+
+
+    const labels = [];
+    const counts = [];
+
+    emergencyCount.forEach(item =>{
+        labels.push(item.sname.substring(4));
+        counts.push(item.emergencyCount);
+    });
+    console.log("labels:" + labels);
+    console.log("counts:" + counts);
+
     new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['은평구', '서대문구', '종로구'],
+            labels: labels,
             datasets: [
                 {
                     label: '위급 상황 횟수',
-                    data: [3, 1, 2], // 오늘 각 구에서 탐지된 위급 상황 횟수
+                    data: counts, // 오늘 각 구에서 탐지된 위급 상황 횟수
                     backgroundColor: 'rgba(239, 68, 68, 0.8)', // 빨간색
                     borderColor: 'rgba(239, 68, 68, 1)',
                     borderWidth: 1,
@@ -166,7 +181,7 @@
                 x: {
                     title: {
                         display: true,
-                        text: '지역구',
+                        text: '주소',
                     },
                 },
             },
