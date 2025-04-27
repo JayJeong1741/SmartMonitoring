@@ -34,7 +34,8 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
             model.addAttribute("inspectionState", inspectionState)
             model.addAttribute("emergencyLocList", trafficLightRepository.findEmergencyLOC(cid))
             model.addAttribute("emergencyCount", trafficLightRepository.emergencyCountByCid(cid))
-            println("data" + trafficLightRepository.emergencyCountByCid(cid))
+            model.addAttribute("lastEmergency", trafficLightRepository.lastEmergency(cid))
+            println("data" + trafficLightRepository.lastEmergency(cid))
         }
     }
 

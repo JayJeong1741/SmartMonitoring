@@ -7,16 +7,38 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 data class TrafficLightDto(
     val sName: String,
     val emergencyCount: Int
 )
 
+data class LastEmergencyDto(
+    val id : Long,
+    val cid: Long,
+    val sName: String,
+    val lastEmergency:Timestamp
+)
+
 
 interface TrafficLightRepository : JpaRepository<TrafficLight, String> {
 
-    @Query("SELECT t FROM TrafficLight t WHERE t.id.cid = :cid")
+    @Query(
+        """
+    SELECT t 
+    FROM TrafficLight t 
+    WHERE t.id.cid = :cid 
+    ORDER BY 
+CASE 
+    WHEN t.state = 1 THEN 0  
+    WHEN t.state = 2 THEN 1  
+    ELSE 2                 
+  END,
+  t.id.id ASC
+    """
+    )
     fun findByCid(@Param("cid") cid: Long, pageable: Pageable): Slice<TrafficLight>
 
     @Query("SELECT t FROM TrafficLight t WHERE t.id.cid = :cid AND t.state = 1")
@@ -39,6 +61,12 @@ interface TrafficLightRepository : JpaRepository<TrafficLight, String> {
         nativeQuery = true
     )
     fun emergencyCountByCid(cid: Long): List<TrafficLightDto>
+
+    @Query(
+        value = "SELECT id, cid, s_name, last_emergency FROM traffic_light WHERE cid = :cid ORDER BY last_emergency DESC LIMIT 2 ",
+        nativeQuery = true
+    )
+    fun lastEmergency(cid: Long): List<LastEmergencyDto>
 
 
     @Modifying
