@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{layouts/base::html(main=~{::main})}"> lang="ko">
+<html th:replace="~{layouts/base::html(main=~{::main})}" xmlns="http://www.w3.org/1999/html"> lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,11 +26,10 @@
 
         <div th:each="trafficLight : ${trafficLights}" class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 mb-4">
 
+            <a th:href="@{/trafficLight/trafficDetail(id=${trafficLight.id.id},cid=${trafficLight.id.cid})}" class="text-blue-500 hover:bg-gray-100 font-semibold">
             <div class="flex items-center justify-between">
                 <div class="flex-1">
-                    <a th:href="@{/trafficLight/trafficDetail(id=${trafficLight.id.id},cid=${trafficLight.id.cid})}" class="text-blue-500 hover:underline font-semibold"
-                       th:text="|TL00${trafficLight.id.id}|">
-                    </a>
+                    <span th:text="|TL00${trafficLight.id.id}|"></span>
                 </div>
                 <div class="flex-1 text-gray-600">
                     <span th:text="${trafficLight.sName}">광화문</span>
@@ -64,6 +63,7 @@
                 </div>
 
             </div>
+            </a>
         </div>
         <div th:replace="~{layouts/pagenation::p}"></div>
     </div>

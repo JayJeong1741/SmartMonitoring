@@ -11,6 +11,8 @@ import java.security.SecureRandom
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Base64
+import kotlin.math.*
+
 
 /** queryString을 포함한 full url */
 val HttpServletRequest.fullUrl: String
