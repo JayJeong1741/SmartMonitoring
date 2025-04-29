@@ -140,7 +140,10 @@
         var lat = /*[[${trafficLight.lat}]]*/ '37.5665';
         var lng = /*[[${trafficLight.lng}]]*/ '126.9780';
 
-        const socket = io("http://localhost:3000"); // Socket.IO 서버 주소
+        const socket = io("http://192.168.35.59:3000", {
+            withCredentials: true,
+            transports: ["websocket", "polling"]
+        });
         const idCid = id.toString()+"&"+cid.toString()
 
         socket.emit("connection", idCid)
