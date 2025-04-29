@@ -76,6 +76,7 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
 
     @GetMapping("/api/emergency_traffic_lights")//대시보드 지도 위치 업데이트 api
     @ResponseBody
+    @CrossOrigin(origins = ["*"])
     fun getTrafficLights(@SessionAttribute user:User): List<TrafficLight?>? {
         val cid = user.constituencyId.id
 
@@ -84,6 +85,7 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
 
     @PostMapping("/api/state_update")
     @ResponseBody
+    @CrossOrigin(origins = ["*"])
     fun updateTrafficLightState(@RequestBody trafficInfo: TrafficInfo, model: Model): String {
 
         if(trafficInfo.state == 0){

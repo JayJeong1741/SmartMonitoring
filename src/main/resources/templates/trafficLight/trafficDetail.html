@@ -140,7 +140,7 @@
         var lat = /*[[${trafficLight.lat}]]*/ '37.5665';
         var lng = /*[[${trafficLight.lng}]]*/ '126.9780';
 
-        const socket = io("http://192.168.35.59:3000", {
+        const socket = io("http://118.218.212.147:59726", {
             withCredentials: true,
             transports: ["websocket", "polling"]
         });
@@ -245,7 +245,7 @@
             console.log("Json 정보:", trafficInfo); // 실제 구현 시 서버 요청 추가
 
             // 서버로 POST 요청 보내기
-            fetch("http://localhost:8080/main/api/state_update", {
+            fetch("http://118.218.212.147:59727/main/api/state_update", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
