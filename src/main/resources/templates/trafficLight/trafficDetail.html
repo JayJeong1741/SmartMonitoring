@@ -134,7 +134,7 @@
     <script th:inline="javascript">
 
         if (!sessionStorage.getItem('sessionId')) {
-            const sessionId = crypto.randomUUID(); // 또는 Date.now() + Math.random()
+            const sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
             sessionStorage.setItem('sessionId', sessionId);
         }
         console.log('Session ID:', sessionStorage.getItem('sessionId'));
@@ -152,7 +152,7 @@
 
 
 
-        const socket = io("http://192.168.35.46:3000", {
+        const socket = io("http://118.218.212.147:59726", {
             withCredentials: true,
             transports: ["websocket", "polling"]
         });
