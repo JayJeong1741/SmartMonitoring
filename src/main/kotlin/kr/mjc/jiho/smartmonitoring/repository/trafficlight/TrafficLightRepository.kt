@@ -84,19 +84,8 @@ CASE
 
     @Modifying
     @Transactional
-    @Query("UPDATE TrafficLight t SET t.state = 0 WHERE t.id.id = :id AND t.id.cid = :cid")
-    fun setSafe(id:Long, cid:Long)
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE TrafficLight t SET t.state = 1 WHERE t.id.id = :id AND t.id.cid = :cid")
-    fun setUnsafe(id:Long, cid:Long)
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE TrafficLight t SET t.state = 2 WHERE t.id.id = :id AND t.id.cid = :cid")
-    fun setInspection(id:Long, cid:Long)
-
+    @Query("UPDATE TrafficLight t SET t.state = :state WHERE t.id.id = :id AND t.id.cid = :cid")
+    fun updateState(id:Long, cid:Long, state: Int) : Int
 
     @Query("""
         SELECT id, cid, lat, lng, s_name,

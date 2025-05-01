@@ -61,7 +61,6 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
 
         val trafficLight : TrafficLight? =trafficLightRepository.findByIdCid(id, cid)
 
-
         if (trafficLight != null) {
             if(trafficLight.lat != null && trafficLight.lng != null) {
                 model.addAttribute("nearestLoc",
@@ -87,15 +86,18 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
     @ResponseBody
     @CrossOrigin(origins = ["*"])
     fun updateTrafficLightState(@RequestBody trafficInfo: TrafficInfo, model: Model): String {
+        println("trafficState:" + trafficInfo.state)
+        try {
+            //trafficLightRepository.updateState(trafficInfo.id, trafficInfo.cid, trafficInfo.state)
+            println("업데이트 실행 완료")
+            val updatedRows = trafficLightRepository.updateState(trafficInfo.id, trafficInfo.cid, trafficInfo.state)
+            println("업데이트된 행 수: $updatedRows")
+            return "{\"message\": \"신호 상태가 성공적으로 업데이트되었습니다.\"}"
 
-        if(trafficInfo.state == 0){
-            trafficLightRepository.setSafe(trafficInfo.id, trafficInfo.cid)
-        }else if(trafficInfo.state == 1){
-            trafficLightRepository.setUnsafe(trafficInfo.id, trafficInfo.cid)
-        }else if(trafficInfo.state == 2){
-            trafficLightRepository.setInspection(trafficInfo.id, trafficInfo.cid)
+        } catch (e: Exception) {
+            println("\"업데이트 중 예외 발생: ${e.message}\"")
+            return ("업데이트 중 예외 발생: ${e.message}")
         }
-        return "{\"message\": \"신호 상태가 성공적으로 업데이트되었습니다.\"}"
-    }
 
+    }
 }

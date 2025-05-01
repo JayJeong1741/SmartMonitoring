@@ -133,52 +133,72 @@
 
     <script th:inline="javascript">
 
-        var id = /*[[${trafficLight.id.id}]]*/ 'TL001';
-        var status = /*[[${trafficLight.state}]]*/ '0';
-        var cid = /*[[${trafficLight.id.cid}]]*/ '은평구';
+        if (!sessionStorage.getItem('sessionId')) {
+            const sessionId = crypto.randomUUID(); // 또는 Date.now() + Math.random()
+            sessionStorage.setItem('sessionId', sessionId);
+        }
+        console.log('Session ID:', sessionStorage.getItem('sessionId'));
+        const sessionId = sessionStorage.getItem('sessionId');
 
-        var lat = /*[[${trafficLight.lat}]]*/ '37.5665';
-        var lng = /*[[${trafficLight.lng}]]*/ '126.9780';
+        const trafficData = {
+            id: [[${trafficLight.id.id}]],
+            cid: [[${trafficLight.id.cid}]],
+            state: [[${trafficLight.state}]],
+            lat:[[${trafficLight.lat}]],
+            lng :[[${trafficLight.lng}]]
+        };
 
-        const socket = io("http://118.218.212.147:59726", {
+        console.log("trafficLight:" + JSON.stringify(trafficData))
+
+
+
+        const socket = io("http://192.168.35.46:3000", {
             withCredentials: true,
             transports: ["websocket", "polling"]
         });
-        const idCid = id.toString()+"&"+cid.toString()
+        const idCid = trafficData.id.toString()+"&"+trafficData.cid.toString()
 
-        socket.emit("connection", idCid)
+
+
+        const connectionInfo = {
+            "sessionId" : sessionId,
+            "idCid" : idCid
+        }
+
+        const room = sessionId + idCid
+        JSON.stringify(connectionInfo)
+
+        socket.emit("connection", connectionInfo)
+
+        socket.on("successMessage", (data) => {
+            console.log("파이썬과 연결 메시지:" + data)
+        })
 
         // Leaflet.js 지도 초기화
-        const map = L.map('map').setView([lat, lng], 15); // 서울 중심
+        const map = L.map('map').setView([trafficData.lat, trafficData.lng], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         }).addTo(map);
 
         // 신호등 데이터 (위급 상태만 표시)
-        const trafficLights = [
-            { id: id, lat: lat, lng: lng, status: status, district: cid }
-        ];
+        let color = ""
+        if (trafficData.state === 0) {
+            color = 'green';
+        } else if (trafficData.state === 1) {
+            color = 'red';
+        } else if (trafficData.state === 2) {
+            color = 'brown';
+        } else {
+        }
+        console.log("lat lnf" + trafficData.lat + trafficData.lng)
+        L.circleMarker([trafficData.lat, trafficData.lng], {
+            color: color,
+            radius: 8,
+        })
+            .addTo(map)
+            .bindPopup(`<a href="traffic-detail.html?id=${trafficData.id}">${trafficData.id}</a> - ${trafficData.state} (${trafficData.cid})`)
+            .on('click', () => window.location.href = `traffic-detail.html?id=${trafficData.id}`);
 
-        trafficLights.forEach(light => {
-            let color = '';
-            if (light.status === '1') {
-                color = 'red';
-            } else if (light.status === '0') {
-                color = 'green';
-            } else if (light.status === '2') {
-                color = 'brown';
-            } else {
-                return; // 만약 다른 status는 표시 안 하려면
-            }
-
-            L.circleMarker([light.lat, light.lng], {
-                color: color,
-                radius: 8,
-            })
-                .addTo(map)
-                .bindPopup(`<a href="traffic-detail.html?id=${light.id}">${light.id}</a> - ${light.status} (${light.district})`)
-                .on('click', () => window.location.href = `traffic-detail.html?id=${light.id}`);
-        });
 
         function togglePopup() {
             const popup = document.getElementById("popupMenu");
@@ -196,8 +216,8 @@
         }
 
         function play(){
-            console.log("idCid" + idCid)
-            socket.emit("videoCall", idCid)
+            console.log("room:" + room)
+            socket.emit("videoCall", room)
 
             socket.on('frame', (data) => {
                 console.log("영상 수신")
@@ -217,7 +237,7 @@
             });
         }
         function stop(){
-            socket.emit("stopVideo", idCid)
+            socket.emit("stopVideo", room)
             console.log("emit stop")
         }
 
@@ -237,8 +257,8 @@
         function submitState() {
             const selectedState = parseInt(document.getElementById("stateSelect").value, 10);
             const trafficInfo = {
-                id: id,      // id 값은 미리 설정되어 있다고 가정
-                cid: cid,    // cid 값도 미리 설정되어 있다고 가정
+                id: trafficData.id,      // id 값은 미리 설정되어 있다고 가정
+                cid: trafficData.cid,    // cid 값도 미리 설정되어 있다고 가정
                 state: selectedState
             }
 
@@ -261,10 +281,9 @@
                 .catch(error => {
                     console.error("서버 요청 중 오류 발생:", error);
                 });
+            console.log(JSON.stringify(trafficInfo));
         }
     </script>
-
-
 
 </main>
 </body>
