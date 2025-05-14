@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>신호등 모니터링 - 대시보드</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -34,29 +34,31 @@
 
 <!-- 대시보드 콘텐츠 -->
 <section class="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">대시보드</h2>
+    <h2 th:if="${session.user}" th:text="${session.user.constituencyId.cNameH} + ' 실시간 현황'" class="text-3xl font-bold text-gray-800 mb-6">대시보드</h2>
 
-    <!-- 상태 요약 위젯 -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
-            <h3 class="text-lg font-semibold text-gray-700">정상</h3>
-            <p class="text-3xl font-bold text-green-600" th:text="${normalState}">45</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
-            <h3 class="text-lg font-semibold text-gray-700" >위급</h3>
-            <p class="text-3xl font-bold text-red-600" th:text="${emergencyState}">2</p>
-        </div>
-        <div class="bg-white p-6 rounded-lg shadow-md text-center">
-            <h3 class="text-lg font-semibold text-gray-700">점검 중</h3>
-            <p class="text-3xl font-bold text-yellow-600" th:text="${inspectionState}">3</p>
-        </div>
-    </div>
 
     <!-- 메인 콘텐츠: 지도 + 알림/차트 -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- 지도 뷰 -->
         <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">📍위급 신호등 위치</h3>
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-sm sm:text-base md:text-lg font-semibold text-gray-700">📍신호등 상태 현황</h3>
+                <div class="flex">
+                    <div class="flex items-center">
+                        <h3 class="text-sm sm:text-sm md:text-lg font-semibold text-gray-700 mr-1 sm:mr-2 ml-2 sm:ml-2 md:ml-5">정상</h3>
+                        <p class="text-sm sm:text-sm md:text-lg font-bold text-green-600" th:text="${normalState}">45</p>
+                    </div>
+                    <div class="flex items-center">
+                        <h3 class="text-sm sm:text-sm md:text-lg font-semibold text-gray-700 mr-1 sm:mr-2 ml-2 sm:ml-2 md:ml-5">위급</h3>
+                        <p class="text-sm sm:text-sm md:text-lg font-bold text-red-600" th:text="${emergencyState}">2</p>
+                    </div>
+                    <div class="flex items-center">
+                        <h3 class="text-sm sm:text-sm md:text-lg font-semibold text-gray-700 mr-1 sm:mr-2 ml-2 sm:ml-2 md:ml-5">점검중</h3>
+                        <p class="text-sm sm:text-sm md:text-lg font-bold text-yellow-600" th:text="${inspectionState}">3</p>
+                    </div>
+                </div>
+            </div>
+
             <div id="map" class="w-full h-96 rounded-lg relative z-10"></div>
         </div>
 
@@ -81,73 +83,181 @@
             </div>
         </div>
     </div>
+    <!-- 팝업 HTML -->
     <div id="emergencyPopup"
-         class="hidden fixed top-20 left-1/2 -translate-x-1/2 bg-red-600 text-white p-6 rounded-xl shadow-2xl z-50 popup-fade-down w-full max-w-md">
-        <h3 class="text-xl font-bold mb-2">🚨 위급 상황 발생!</h3>
-        <p id="popupMessage">신호등 TL002에서 위급 상황이 발생했습니다.</p>
-        <button onclick="closePopup()" class="mt-4 bg-white text-red-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100">닫기</button>
+         class="hidden fixed top-20 left-1/2 -translate-x-1/2 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-50 w-full max-w-md space-y-4 text-center animate-fade-in-down">
+        <h3 class="text-2xl font-bold">🚨 위급 상황 발생!</h3>
+        <p id="popupMessage" class="text-base leading-relaxed">
+            신호등 TL002에서 위급 상황이 발생했습니다.
+        </p>
+        <a id="emergencyHref" href="#" onclick="closePopup()"
+           class="inline-block bg-white text-red-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">확인
+        </a>
     </div>
+
+    <button onclick="blink(2)">-</button>
+
 </section>
 
 <!-- 팝업 알림 -->
-
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 
-    <script th:inline="javascript">
-        const map = L.map('map').setView([37.5665, 126.9780], 12);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap',
-        }).addTo(map);
 
+    <script th:inline="javascript">
+
+        const lat = [[${session.user?.lat ?: null}]];
+        const lng = [[${session.user?.lng ?: null}]];
+        const userCode = [[${session.user?.userCode ?: null}]];
+
+        let trafficLights = /*[[${trafficLightLoc}]]*/ [];
+
+        let map
         let markers = []; // 기존 마커 저장용
 
-        // 마커 초기 렌더링 (Thymeleaf에서 렌더된 값)
-        const trafficLights = /*[[${emergencyLocList}]]*/ [];
-        console.log("loc : " + trafficLights)
+        if (map) {
+            map.remove(); // 기존 지도 객체 제거
+        }
+
+        if (userCode === 0) {
+            zoomLevel = 12;
+        }else{
+            zoomLevel = 16;
+        }
+
+        map = L.map('map', { renderer: L.canvas() }).setView([lat, lng], zoomLevel);
+
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // 타일 로드와 상관없이 바로 호출
+        renderMarkers(trafficLights);
+
 
         function renderMarkers(lights) {
-            // 기존 마커 제거
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
-
             lights.forEach(light => {
-                const markerOptions = {
-                    color: light.state === 1 ? 'red' : 'green',
-                    radius: 8,
+                const normalMarkerOptions = {
+                    color: light.state === 0 ? 'green'
+                         : light.state === 1 ? 'red'
+                            : 'brown',
+                    fillColor: light.state === 0 ? 'green'
+                             : light.state === 1 ? 'red'
+                             : 'brown',
+                    fillOpacity: 0.3,
+                    radius: 7,
                 };
-
-                const marker = L.circleMarker([light.lat, light.lng], markerOptions)
+                const marker = L.circleMarker([light.lat, light.lng], normalMarkerOptions)
                     .addTo(map)
                     .on('click', () => {
                         window.location.href = `/main/trafficLight/trafficDetail?id=${light.id.id}&cid=${light.id.cid}`;
                     });
-
                 markers.push(marker);
             });
+            console.log('Current markers:', markers);
         }
-        // 초기 렌더링
-        if (trafficLights.length > 0) {
-            map.setView([trafficLights[0].lat, trafficLights[0].lng], 12);
-            renderMarkers(trafficLights);
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
+
+        async function blink(id){
+            let targetLat;
+            let targetLng;
+
+            for (let i = 0; i < markers.length; i++) {
+                markers[i].setStyle({
+                    opacity: 0,
+                    fillOpacity: 0
+                });
+                console.log("markers opacity : " + markers[i].options.opacity)
+            }
+            console.log("trafficLocLat:" + JSON.stringify(trafficLights[1]));
+            for(let i = 0; i<trafficLights.length; i++){
+                console.log("incorrect id");
+                if(trafficLights[i].id.id === id){
+                    console.log("correct id");
+                    targetLat = trafficLights[i].lat;
+                    targetLng = trafficLights[i].lng;
+                    trafficLights[i].state = 1;
+                    break;
+                }
+            }
+            map.flyTo([targetLat, targetLng],18);
+
+            map.once("moveend", async function(){
+
+                for (let i = 0; i < markers.length; i++) {
+                    markers[i].setStyle({
+                        opacity: 1,
+                        fillOpacity: 0.3,
+                        radius: 9
+                    });
+                    console.log("markers opacity : " + markers[i].options.opacity)
+                }
+
+                for(let i=0; i<markers.length; i++){
+                    const{lat, lng} = markers[i].getLatLng();
+                    if(lat === targetLat && lng === targetLng ) {
+                        for(let j = 0; j<10; j++){
+                            markers[i].setStyle({
+                                opacity: 0,
+                                fillOpacity: 0
+                            });
+                            console.log("markers color target:" + markers[i].options.color)
+                            await sleep(500);
+                            markers[i].setStyle({
+                                opacity: 1,
+                                fillOpacity: 0.3,
+                                fillColor: 'red',
+                                color: 'red',
+                                radius: 9
+                            });
+                            await sleep(500);
+                        }
+                        break;
+                    }
+                }
+            });
+
+        }
+
+        async function getEmergencyTrafficLightLoc(){
+            const response = await fetch(`${window.Config.API_BASE_URL}:8080/main/api/emergency_traffic_lights`);
+            return await response.json();  // JSON 응답 그대로 반환
+        }
+
+        /*function getTrafficLightLoc(){
+            const list = []
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/traffic_lights`)  // JSON 형태의 API 필요
+                .then(res => res.json())
+                .then(data => {
+                    list.push(data)
+                });
+            return list
+        }*/
+        async function getTrafficLightLoc(){
+            const response = await fetch(`${window.Config.API_BASE_URL}:8080/main/api/traffic_lights`);
+            return await response.json();  // JSON 응답 그대로 반환
+        }
+
         // 주기적으로 서버에서 신호등 데이터를 받아와 갱신
         function fetchTrafficLights() {
-            fetch('http://118.218.212.147:59727/main/api/emergency_traffic_lights')  // JSON 형태의 API 필요
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/emergency_traffic_lights`)  // JSON 형태의 API 필요
                 .then(res => res.json())
                 .then(data => {
                     renderMarkers(data);
                 });
         }
 
-        setInterval(fetchTrafficLights, 5000); // 5초마다 갱신
+        //setInterval(fetchTrafficLights, 5000);
 
 
 
     // Chart.js 막대 그래프 초기화
     const ctx = document.getElementById('statusChart').getContext('2d');
     const emergencyCount =  /*[[${emergencyCount}]]*/ [];
-    console.log("ㅇㄴ릉니 : " + JSON.stringify(emergencyCount))
-
 
     const labels = [];
     const counts = [];
@@ -156,8 +266,6 @@
         labels.push(item.sname.substring(4));
         counts.push(item.emergencyCount);
     });
-    console.log("labels:" + labels);
-    console.log("counts:" + counts);
 
     new Chart(ctx, {
         type: 'bar',
@@ -200,29 +308,86 @@
             },
         },
     });
-    // 팝업 알림 함수
-    function showPopup(message) {
-        document.getElementById('popupMessage').textContent = message;
-        document.getElementById('emergencyPopup').classList.remove('hidden');
-    }
 
-    function closePopup() {
-        document.getElementById('emergencyPopup').classList.add('hidden');
-    }
-</script>
-<script>
-    const socket = io("http://localhost:3000", {
-        withCredentials: true,
-        transports: ["websocket", "polling"]
-    });
+        window.Config = {
+            API_BASE_URL: [[${@environment.getProperty('api.base.url')}]]
+        };
 
-    socket.on("detection", (data) => {
-        console.log("detection from socket server")
-        if (data === "guideDog"){
-            showPopup('안내견 탐지!');
+        const siren = new Audio('../siren.mp3');
+        siren.muted = true;
+
+
+        const socket = io(`${window.Config.API_BASE_URL}:3000`, {
+            withCredentials: true,
+            transports: ["websocket", "polling"]
+        });
+
+        const cid = [[${session.user.constituencyId.id}]];
+        socket.emit("connectionForAlarm", cid );
+
+        socket.on("detection", async (data) => {
+            console.log("detection from socket server");
+            console.log(data);
+
+            try {
+                await siren.play();
+                siren.muted = false;
+            } catch (err) {
+                console.error('Initial play failed:', err);
+            }
+
+            updateStateEmergency(data);
+            showPopup(data);
+
+            await sleep(500);  // 1초 대기
+            blink(data.id);
+        });
+
+        function closePopup(){
+            document.getElementById('emergencyPopup').classList.add('hidden');
         }
-    });
+
+
+        function showPopup(data) {
+            let message = ""
+            if(data.cls === 'carAccident'){
+                message = "TL00" + data.id + "에서 교통사고가 발생했습니다."
+            }
+            else if(data.cls === 'fallen'){
+                message = "TL00" + data.id + "에서 낙상자가 감지되었습니다."
+            }
+            document.getElementById('popupMessage').textContent = message;
+            document.getElementById('emergencyHref').href = "/main/trafficLight/trafficDetail?id=" + data.id + "&cid=" + data.cid
+            document.getElementById('emergencyPopup').classList.remove('hidden');
+        }
+
+        function updateStateEmergency(data) {
+            const trafficInfo = {
+                id: data.id,
+                cid: data.cid,
+                state: 1
+            };
+
+            console.log("Json 정보:", trafficInfo);
+
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state_update`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(trafficInfo)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("서버 응답:", data);
+                })
+                .catch(error => {
+                    console.error("서버 요청 중 오류 발생:", error);
+                });
+        }
+
 </script>
+
 </main>
 </body>
 </html>

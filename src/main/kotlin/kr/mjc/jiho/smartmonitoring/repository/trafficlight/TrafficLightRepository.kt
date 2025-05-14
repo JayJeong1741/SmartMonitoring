@@ -1,6 +1,5 @@
 package kr.mjc.jiho.smartmonitoring.repository.trafficlight
 
-import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
@@ -24,17 +23,18 @@ data class LastEmergencyDto(
     val lastEmergency:Timestamp
 )
 
-data class NearestLoc(
+data class TrafficLightLoc(
     val id: Long,
     val cid: Long,
     val lat: BigDecimal,
     val lng: BigDecimal,
     val sName:String,
+    val state: Int,
     val distance: Double
 )
 
 
-interface TrafficLightRepository : JpaRepository<TrafficLight, String> {
+interface TrafficLightRepository : JpaRepository<TrafficLight, Long> {
 
     @Query("""
     SELECT t 
@@ -50,8 +50,11 @@ CASE
     """)
     fun findByCid(@Param("cid") cid: Long, pageable: Pageable): Slice<TrafficLight>
 
-    @Query("SELECT t FROM TrafficLight t WHERE t.id.cid = :cid AND t.state = 1")
-    fun findEmergencyLOC(cid:Long): List<TrafficLight>?
+    @Query("SELECT t FROM TrafficLight t WHERE t.id.cid = :cid")
+    fun findTrafficLightLOC(cid:Long): List<TrafficLight>?
+
+    @Query("SELECT t FROM TrafficLight  t WHERE t.id.cid = :cid AND t.state = 1")
+    fun findEmergencyTrafficLightLoc(cid:Long): List<TrafficLight>?
 
     @Query("SELECT t FROM TrafficLight t WHERE t.id.id = :id AND t.id.cid = :cid")
     fun findByIdCid(id : Long, cid: Long) : TrafficLight?
@@ -84,18 +87,47 @@ CASE
 
     @Modifying
     @Transactional
-    @Query("UPDATE TrafficLight t SET t.state = :state WHERE t.id.id = :id AND t.id.cid = :cid")
-    fun updateState(id:Long, cid:Long, state: Int) : Int
+    @Query(
+        """
+    UPDATE TrafficLight t 
+    SET 
+        t.state = :state, 
+        t.emergencyCount = CASE 
+        WHEN :state = 1 THEN t.emergencyCount + 1
+        ELSE t.emergencyCount 
+        END,
+        t.lastEmergency = CASE 
+        WHEN :state = 1 THEN :now ELSE t.lastEmergency END
+    WHERE 
+    t.id.id = :id AND t.id.cid = :cid
+    """
+    )
+    fun updateState(id: Long, cid: Long, state: Int, now: LocalDateTime): Int
 
     @Query("""
-        SELECT id, cid, lat, lng, s_name,
+        SELECT id, cid, lat, lng, s_name, state,
                (6371 * ACOS(SIN(RADIANS(:targetLat)) * SIN(RADIANS(lat)) +
                             COS(RADIANS(:targetLat)) * COS(RADIANS(lat)) * COS(RADIANS(lng) - RADIANS(:targetLon)))) AS distance
         FROM traffic_light
-        WHERE id != :id
+        WHERE id != :id AND cid = :cid
         ORDER BY distance
         LIMIT 3""", nativeQuery = true)
-    fun findClosestTrafficLights(targetLat: BigDecimal, targetLon: BigDecimal, id:Long): List<NearestLoc>
+    fun findClosestTrafficLights(targetLat: BigDecimal, targetLon: BigDecimal, id:Long, cid: Long): List<TrafficLightLoc>
 
+
+    @Query("""
+    SELECT *,
+           (6371 * ACOS(SIN(RADIANS(:targetLat)) * SIN(RADIANS(lat)) +
+                        COS(RADIANS(:targetLat)) * COS(RADIANS(lat)) * COS(RADIANS(lng) - RADIANS(:targetLon)))) AS distance
+    FROM traffic_light
+    WHERE cid = :cid
+    HAVING distance <= 0.3
+    ORDER BY distance
+""", nativeQuery = true)
+    fun findTrafficLightsWithin300m(
+        targetLat: BigDecimal,
+        targetLon: BigDecimal,
+        cid: Long
+    ): List<TrafficLight>?
 
 }

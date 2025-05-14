@@ -1,7 +1,7 @@
 package kr.mjc.jiho.smartmonitoring.controller
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo
 import jakarta.servlet.http.HttpSession
+import kr.mjc.jiho.smartmonitoring.repository.constituency.ConstituencyRepository
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLight
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLightRepository
 import kr.mjc.jiho.smartmonitoring.repository.user.User
@@ -10,6 +10,7 @@ import org.springframework.data.domain.Slice
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
+import java.time.LocalDateTime
 
 data class TrafficInfo(
     val id: Long,
@@ -19,7 +20,10 @@ data class TrafficInfo(
 
 
 @Controller
-class TrafficLightController(val trafficLightRepository: TrafficLightRepository) {
+class TrafficLightController(
+    val trafficLightRepository: TrafficLightRepository,
+    private val constituencyRepository: ConstituencyRepository
+) {
 
     companion object {
         private const val PAGE_SIZE = 20
@@ -29,14 +33,19 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
     fun dashboard(@SessionAttribute user: User, model: Model) {
         val cid: Long? = user.constituencyId.id
 
-        if (cid != null) {
+        val trafficLightLoc : List<TrafficLight>?
+
+        if(cid != null) {
+
+            trafficLightLoc = trafficLightRepository.findTrafficLightLOC(cid)
+            model.addAttribute("trafficLightLoc", trafficLightLoc)
+
             val normalState: Int = trafficLightRepository.countTrafficLightNormal(cid)
             val emergencyState: Int = trafficLightRepository.countTrafficLightEmergency(cid)
             val inspectionState: Int = trafficLightRepository.countTrafficLightInspection(cid)
             model.addAttribute("normalState", normalState)
             model.addAttribute("emergencyState", emergencyState)
             model.addAttribute("inspectionState", inspectionState)
-            model.addAttribute("emergencyLocList", trafficLightRepository.findEmergencyLOC(cid))
             model.addAttribute("emergencyCount", trafficLightRepository.emergencyCountByCid(cid))
             model.addAttribute("lastEmergency", trafficLightRepository.lastEmergency(cid))
         }
@@ -64,7 +73,7 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
         if (trafficLight != null) {
             if(trafficLight.lat != null && trafficLight.lng != null) {
                 model.addAttribute("nearestLoc",
-                    trafficLightRepository.findClosestTrafficLights(trafficLight.lat, trafficLight.lng, id)
+                    trafficLightRepository.findClosestTrafficLights(trafficLight.lat, trafficLight.lng, id, cid)
                 )
             }
             model.addAttribute("trafficLight", trafficLight)
@@ -76,21 +85,32 @@ class TrafficLightController(val trafficLightRepository: TrafficLightRepository)
     @GetMapping("/api/emergency_traffic_lights")//대시보드 지도 위치 업데이트 api
     @ResponseBody
     @CrossOrigin(origins = ["*"])
-    fun getTrafficLights(@SessionAttribute user:User): List<TrafficLight?>? {
+    fun findEmergencyTrafficLight(@SessionAttribute user:User): List<TrafficLight?>? {
         val cid = user.constituencyId.id
 
-        return cid?.let { trafficLightRepository.findEmergencyLOC(it) }
+        return cid?.let { trafficLightRepository.findEmergencyTrafficLightLoc(it) }
     }
+
+
+    @GetMapping("/api/traffic_lights")//대시보드 지도 위치 업데이트 api
+    @ResponseBody
+    @CrossOrigin(origins = ["*"])
+    fun findTrafficLight(@SessionAttribute user:User): List<TrafficLight?>? {
+        val cid = user.constituencyId.id
+
+        return cid?.let { trafficLightRepository.findTrafficLightLOC(it) }
+    }
+
 
     @PostMapping("/api/state_update")
     @ResponseBody
     @CrossOrigin(origins = ["*"])
-    fun updateTrafficLightState(@RequestBody trafficInfo: TrafficInfo, model: Model): String {
+    fun updateTrafficLightState(@RequestBody trafficInfo: TrafficInfo): String {
         println("trafficState:" + trafficInfo.state)
         try {
-            //trafficLightRepository.updateState(trafficInfo.id, trafficInfo.cid, trafficInfo.state)
             println("업데이트 실행 완료")
-            val updatedRows = trafficLightRepository.updateState(trafficInfo.id, trafficInfo.cid, trafficInfo.state)
+            println("현재시간:" + LocalDateTime.now())
+            val updatedRows = trafficLightRepository.updateState(trafficInfo.id, trafficInfo.cid, trafficInfo.state, LocalDateTime.now())
             println("업데이트된 행 수: $updatedRows")
             return "{\"message\": \"신호 상태가 성공적으로 업데이트되었습니다.\"}"
 

@@ -14,14 +14,26 @@
     <section class="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 class="text-3xl font-bold text-gray-800 mb-6">신호등 상세 정보</h2>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- 실시간 영상 -->
+            <!-- 탭 메뉴 및 콘텐츠 -->
             <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">📹 실시간 영상</h3>
-                <div class="relative w-full h-96 bg-gray-800 rounded-lg overflow-hidden">
-                    <img id="video" class="w-full h-full object-cover">
-                    <div class="absolute bottom-4 left-4 right-4 flex justify-center space-x-2">
-                        <button onclick="play()" class="bg-gray-700 text-white px-3 py-1 rounded-md hover:bg-gray-600">▶ 재생</button>
-                        <button onclick="stop()" class="bg-gray-700 text-white px-3 py-1 rounded-md hover:bg-gray-600">❚❚ 일시정지</button>
+                <div class="flex border-b border-gray-200">
+                    <button class="tab-button px-4 py-2 text-gray-600 font-medium focus:outline-none active text-blue-600 border-b-2 border-blue-600" data-tab="video">📹 실시간 영상</button>
+                    <button class="tab-button px-4 py-2 text-gray-600 font-medium focus:outline-none" data-tab="map">📍 신호등 위치</button>
+                </div>
+                <div class="tab-content mt-4">
+                    <!-- 실시간 영상 탭 -->
+                    <div id="video" class="tab-pane active">
+                        <div class="relative w-full h-96 bg-gray-800 rounded-lg overflow-hidden">
+                            <img id="video-frame" class="w-full h-full object-cover">
+                            <div class="absolute bottom-4 left-4 right-4 flex justify-center space-x-2">
+                                <button onclick="play()" class="bg-gray-700 text-white px-3 py-1 rounded-md hover:bg-gray-600">▶ 재생</button>
+                                <button onclick="stop()" class="bg-gray-700 text-white px-3 py-1 rounded-md hover:bg-gray-600">❚❚ 일시정지</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 지도 탭 -->
+                    <div id="map" class="tab-pane hidden">
+                        <div id="map-container" class="w-full h-96 rounded-lg relative z-10"></div>
                     </div>
                 </div>
             </div>
@@ -37,33 +49,31 @@
                         <strong class="mr-2">상태:</strong>
                         <!-- 배경 오버레이 -->
                         <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-50 hidden"></div>
-
-                        <!-- 팝업 -->
                         <div class="flex items-center">
-                        <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium"
-                              th:classappend="
-                              ${trafficLight.state} == 0 ? ' bg-green-100 text-green-800' :
-                              (${trafficLight.state} == 1 ? ' bg-red-100 text-red-800' :
-                              (${trafficLight.state} == 2 ? ' bg-yellow-100 text-yellow-800' : ''))">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <g th:switch="${trafficLight.state}">
-                                    <g th:case="0">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium"
+                                  th:classappend="
+                                  ${trafficLight.state} == 0 ? ' bg-green-100 text-green-800' :
+                                  (${trafficLight.state} == 1 ? ' bg-red-100 text-red-800' :
+                                  (${trafficLight.state} == 2 ? ' bg-yellow-100 text-yellow-800' : ''))">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <g th:switch="${trafficLight.state}">
+                                        <g th:case="0">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </g>
+                                        <g th:case="1">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
+                                        </g>
+                                        <g th:case="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                                        </g>
                                     </g>
-                                    <g th:case="1">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
-                                    </g>
-                                    <g th:case="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
-                                    </g>
-                                </g>
-                            </svg>
-                            <span th:switch="${trafficLight.state}">
-                                <span th:case="0">정상</span>
-                                <span th:case="1">위급</span>
-                                <span th:case="2">점검</span>
+                                </svg>
+                                <span th:switch="${trafficLight.state}">
+                                    <span th:case="0">정상</span>
+                                    <span th:case="1">위급</span>
+                                    <span th:case="2">점검</span>
+                                </span>
                             </span>
-                        </span>
                         </div>
                     </div>
                     <p><strong>최근 위급상황:</strong>
@@ -113,116 +123,162 @@
         </div>
 
         <div class="container mx-auto px-4 py-8">
-            <!-- 그리드 레이아웃 -->
+            <!-- 추가 정보 -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-                <!-- 지도 뷰 -->
-                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-4">📍신호등 위치</h3>
-                    <div id="map" class="w-full h-96 rounded-lg relative z-10"></div>
-                </div>
-                <!-- 추가 그리드 셀 (필요 시 사용) -->
-                <div class="bg-white p-6 rounded-lg shadow-md hidden lg:block">
+                <div class="bg-white p-6 rounded-lg shadow-md lg:col-span-3">
                     <h3 class="text-lg font-semibold text-gray-700 mb-4">추가 정보</h3>
-                    <p class="text-gray-600">통행 통계 추가예정</p>
+                    <canvas id="trafficChart" class="w-full"></canvas>
                 </div>
             </div>
         </div>
     </section>
 
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <div th:replace="~{layouts/alarm :: socketAlarm}"></div>
 
     <script th:inline="javascript">
 
-        if (!sessionStorage.getItem('sessionId')) {
-            const sessionId = Date.now().toString(36) + Math.random().toString(36).slice(2);
-            sessionStorage.setItem('sessionId', sessionId);
-        }
-        console.log('Session ID:', sessionStorage.getItem('sessionId'));
-        const sessionId = sessionStorage.getItem('sessionId');
+        // 탭 메뉴 스크립트
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 모든 버튼에서 active 클래스 제거
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active', 'text-blue-600', 'border-b-2', 'border-blue-600');
+                    btn.classList.add('text-gray-600');
+                });
+
+                // 모든 탭 콘텐츠 숨기기
+                tabPanes.forEach(pane => {
+                    pane.classList.add('hidden');
+                });
+
+                // 클릭한 버튼에 active 스타일 추가
+                button.classList.add('active', 'text-blue-600', 'border-b-2', 'border-blue-600');
+
+                // 해당 탭 콘텐츠 표시
+                const tabId = button.getAttribute('data-tab');
+                document.getElementById(tabId).classList.remove('hidden');
+
+                // 지도 탭이 활성화되면 지도 렌더링
+                if (tabId === 'map') {
+                    renderMap();
+                }
+            });
+        });
+
+        // 세션 및 소켓 설정
+
+        const socketId = Date.now().toString(36) + Math.random().toString(36).slice(2);
+        sessionStorage.setItem('socketId', socketId);
+
+        console.log('SocketId ID:', sessionStorage.getItem('socketId'));
+
 
         const trafficData = {
             id: [[${trafficLight.id.id}]],
             cid: [[${trafficLight.id.cid}]],
             state: [[${trafficLight.state}]],
-            lat:[[${trafficLight.lat}]],
-            lng :[[${trafficLight.lng}]]
+            lat: [[${trafficLight.lat}]],
+            lng: [[${trafficLight.lng}]]
         };
-
-        console.log("trafficLight:" + JSON.stringify(trafficData))
-
-
-
-        const socket = io("http://118.218.212.147:59726", {
-            withCredentials: true,
-            transports: ["websocket", "polling"]
-        });
-        const idCid = trafficData.id.toString()+"&"+trafficData.cid.toString()
-
-
+        console.log("trafficLight:" + JSON.stringify(trafficData));
+        const idCid = trafficData.id.toString() + "&" + trafficData.cid.toString();
 
         const connectionInfo = {
-            "sessionId" : sessionId,
-            "idCid" : idCid
-        }
+            "socketId": socketId,
+            "idCid": idCid
+        };
 
-        const room = sessionId + idCid
-        JSON.stringify(connectionInfo)
+        const room = socketId + idCid;
+        JSON.stringify(connectionInfo);
 
-        socket.emit("connection", connectionInfo)
+        socket.emit("connection", connectionInfo);
 
         socket.on("successMessage", (data) => {
-            console.log("파이썬과 연결 메시지:" + data)
-        })
+            console.log("파이썬과 연결 메시지:" + data);
+        });
 
-        // Leaflet.js 지도 초기화
-        const map = L.map('map').setView([trafficData.lat, trafficData.lng], 15);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        }).addTo(map);
+        const nearestLoc = /*[[${nearestLoc}]]*/ [];
+        let markers = [];
+        let map = null;
 
-        // 신호등 데이터 (위급 상태만 표시)
-        let color = ""
-        if (trafficData.state === 0) {
-            color = 'green';
-        } else if (trafficData.state === 1) {
-            color = 'red';
-        } else if (trafficData.state === 2) {
-            color = 'brown';
-        } else {
+        function renderMap() {
+            if (map) {
+                map.remove(); // 기존 지도 제거
+            }
+            // Leaflet.js 지도 초기화
+            map = L.map('map-container').setView([trafficData.lat, trafficData.lng], 18);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            }).addTo(map);
+
+            // 신호등 데이터 (위급 상태만 표시)
+            L.marker([trafficData.lat,trafficData.lng], {
+                icon: L.icon({
+                    iconUrl: '../icon.png', // 마커 이미지 경로
+                    iconSize: [38, 38],         // 아이콘 크기 (가로, 세로)
+                    iconAnchor: [19, 38]        // 아이콘의 기준점 (마커의 끝점 위치)
+                })
+            }).addTo(map);
+            L.circleMarker([trafficData.lat, trafficData.lng], {
+                color: trafficData.state === 0 ? 'green'
+                    : trafficData.state === 1 ? 'red'
+                        : 'brown',
+                radius: 8,
+            })
+                .addTo(map)
+                .bindPopup(`상태 : ${trafficData.state}`);
+
+            nearestLoc.forEach(light => {
+                const markerOptions = {
+                    color: light.state === 0 ? 'green'
+                        : light.state === 1 ? 'red'
+                            : 'brown',
+                    radius: 7,
+                };
+
+                L.circleMarker([light.lat, light.lng], markerOptions)
+                    .addTo(map)
+                    .on('click', () => {
+                        window.location.href = `/main/trafficLight/trafficDetail?id=${light.id}&cid=${light.cid}`;
+                    });
+            });
         }
-        console.log("lat lnf" + trafficData.lat + trafficData.lng)
-        L.circleMarker([trafficData.lat, trafficData.lng], {
-            color: color,
-            radius: 8,
-        })
-            .addTo(map)
-            .bindPopup(`<a href="traffic-detail.html?id=${trafficData.id}">${trafficData.id}</a> - ${trafficData.state} (${trafficData.cid})`)
-            .on('click', () => window.location.href = `traffic-detail.html?id=${trafficData.id}`);
 
+        // 초기 지도 렌더링 방지 (탭 전환 시에만 렌더링)
+        if (nearestLoc.length > 0) {
+            // 탭이 '지도'로 시작하지 않으므로 초기 렌더링은 하지 않음
+        }
 
         function togglePopup() {
             const popup = document.getElementById("popupMenu");
+            const overlay = document.getElementById("overlay");
 
             if (popup.classList.contains("hidden")) {
-                document.getElementById('overlay').classList.remove('hidden');
-                document.getElementById('popupMenu').classList.remove('hidden');
+                overlay.classList.remove('hidden');
                 popup.classList.remove("hidden", "opacity-0", "scale-95");
                 popup.classList.add("opacity-100", "scale-100");
             } else {
                 popup.classList.remove("opacity-100", "scale-100");
                 popup.classList.add("opacity-0", "scale-95");
-                setTimeout(() => popup.classList.add("hidden"), 300); // 애니메이션 후 숨김
+                setTimeout(() => {
+                    popup.classList.add("hidden");
+                    overlay.classList.add("hidden");
+                }, 300);
             }
         }
 
-        function play(){
-            console.log("room:" + room)
-            socket.emit("videoCall", room)
+        function play() {
+            console.log("room:" + room);
+            socket.emit("videoCall", room);
 
             socket.on('frame', (data) => {
-                console.log("영상 수신")
+                console.log("영상 수신");
                 try {
-                    document.getElementById('video').src = 'data:image/jpeg;base64,' + data;
+                    document.getElementById('video-frame').src = 'data:image/jpeg;base64,' + data;
                 } catch (e) {
                     console.error('Failed to set image:', e);
                 }
@@ -236,55 +292,77 @@
                 console.error("❌ 연결 오류:", err.message);
             });
         }
-        function stop(){
-            socket.emit("stopVideo", room)
-            console.log("emit stop")
+
+        function stop() {
+            socket.emit("stopVideo", room);
+            console.log("emit stop");
         }
 
         // 팝업 외부 클릭 시 닫기
         window.onclick = function(event) {
             const popup = document.getElementById("popupMenu");
-            const overlay = document.getElementById("overlay")
+            const overlay = document.getElementById("overlay");
             const button = event.target;
             if (!popup.contains(button) && !button.matches("#stateChange")) {
                 popup.classList.remove("opacity-100", "scale-100");
                 popup.classList.add("opacity-0", "scale-95");
-                setTimeout(() => popup.classList.add("hidden"), 300);
-                setTimeout(() => overlay.classList.add("hidden"), 350);
+                setTimeout(() => {
+                    popup.classList.add("hidden");
+                    overlay.classList.add("hidden");
+                }, 300);
             }
-        }
+        };
 
         function submitState() {
             const selectedState = parseInt(document.getElementById("stateSelect").value, 10);
             const trafficInfo = {
-                id: trafficData.id,      // id 값은 미리 설정되어 있다고 가정
-                cid: trafficData.cid,    // cid 값도 미리 설정되어 있다고 가정
+                id: trafficData.id,
+                cid: trafficData.cid,
                 state: selectedState
-            }
+            };
 
-            console.log("Json 정보:", trafficInfo); // 실제 구현 시 서버 요청 추가
+            console.log("Json 정보:", trafficInfo);
 
-            // 서버로 POST 요청 보내기
-            fetch("http://118.218.212.147:59727/main/api/state_update", {
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state_update`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(trafficInfo)  // JSON 형식으로 보냄
+                body: JSON.stringify(trafficInfo)
             })
                 .then(response => response.json())
                 .then(data => {
                     console.log("서버 응답:", data);
-                    togglePopup(); // 확인 버튼 클릭 시 팝업 닫기
-                    location.reload()
+                    togglePopup();
+                    location.reload();
                 })
                 .catch(error => {
                     console.error("서버 요청 중 오류 발생:", error);
                 });
-            console.log(JSON.stringify(trafficInfo));
         }
-    </script>
 
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['4월 30일', '5월 1일', '5월 2일', '5월 3일', '5월 4일', '5월 5일', '5월 6일'],
+                datasets: [{
+                    label: '통행인구 ( 최근 일주일 )',
+                    data: [120, 150, 130, 180, 160, 170, 200],
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </main>
 </body>
 </html>

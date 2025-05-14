@@ -1,0 +1,92 @@
+<!-- 올바른 fragment: head 태그 없이 작성 -->
+<div th:fragment="socketAlarm">
+    <!-- 팝업 HTML -->
+    <div id="emergencyPopup"
+         class="hidden fixed top-20 left-1/2 -translate-x-1/2 bg-red-600 text-white p-6 rounded-2xl shadow-2xl z-50 w-full max-w-md space-y-4 text-center animate-fade-in-down">
+        <h3 class="text-2xl font-bold">🚨 위급 상황 발생!</h3>
+        <p id="popupMessage" class="text-base leading-relaxed">
+            신호등 TL002에서 위급 상황이 발생했습니다.
+        </p>
+        <a id="emergencyHref" href="#" onclick="closePopup()"
+           class="inline-block bg-white text-red-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">확인
+        </a>
+    </div>
+
+    <!-- 자바스크립트 -->
+    <script th:inline="javascript">
+
+        window.Config = {
+            API_BASE_URL: [[${@environment.getProperty('api.base.url')}]]
+        };
+
+        const siren = new Audio('../siren.mp3');
+        siren.muted = true;
+
+
+        const socket = io(`${window.Config.API_BASE_URL}:3000`, {
+            withCredentials: true,
+            transports: ["websocket", "polling"]
+        });
+
+        const cid = [[${session.user.constituencyId.id}]];
+        socket.emit("connectionForAlarm", cid );
+
+        socket.on("detection", (data) => {
+            console.log("detection from socket server");
+            console.log(data)
+
+            siren.play().then(() => {
+                siren.muted = false; // 재생 성공 시 음소거 해제
+            }).catch(err => {
+                console.error('Initial play failed:', err);
+            });
+            setTimeout(() => updateStateEmergency(data), 100);
+            showPopup(data)
+        });
+
+        function closePopup(){
+            document.getElementById('emergencyPopup').classList.add('hidden');
+        }
+
+
+        function showPopup(data) {
+            let message = ""
+            if(data.cls === 'carAccident'){
+                message = "TL00" + data.id + "에서 교통사고가 발생했습니다."
+            }
+            else if(data.cls === 'fallen'){
+                message = "TL00" + data.id + "에서 낙상자가 감지되었습니다."
+            }
+            document.getElementById('popupMessage').textContent = message;
+            document.getElementById('emergencyHref').href = "/main/trafficLight/trafficDetail?id=" + data.id + "&cid=" + data.cid
+            document.getElementById('emergencyPopup').classList.remove('hidden');
+        }
+
+        function updateStateEmergency(data) {
+            const trafficInfo = {
+                id: data.id,
+                cid: data.cid,
+                state: 1
+            };
+
+            console.log("Json 정보:", trafficInfo);
+
+            fetch("http://192.168.35.62:8080/main/api/state_update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(trafficInfo)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log("서버 응답:", data);
+                })
+                .catch(error => {
+                    console.error("서버 요청 중 오류 발생:", error);
+                });
+        }
+    </script>
+
+
+</div>
