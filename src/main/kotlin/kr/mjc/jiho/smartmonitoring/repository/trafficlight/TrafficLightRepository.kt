@@ -1,5 +1,6 @@
 package kr.mjc.jiho.smartmonitoring.repository.trafficlight
 
+import kr.mjc.jiho.smartmonitoring.controller.TrafficLightController
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
@@ -129,5 +130,4 @@ CASE
         targetLon: BigDecimal,
         cid: Long
     ): List<TrafficLight>?
-
 }

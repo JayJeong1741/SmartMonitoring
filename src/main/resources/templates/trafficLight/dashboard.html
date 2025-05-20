@@ -19,11 +19,6 @@
                 transform: translateY(0);
             }
         }
-
-        .popup-fade-down {
-            animation: fadeDown 0.4s ease-out;
-            animation-fill-mode: both; /* 애니메이션 끝난 후 상태 유지 */
-        }
     </style>
 </head>
 <body class="bg-gray-100 font-sans">
@@ -46,15 +41,15 @@
                 <div class="flex">
                     <div class="flex items-center">
                         <h3 class="text-sm sm:text-sm md:text-lg font-semibold text-gray-700 mr-1 sm:mr-2 ml-2 sm:ml-2 md:ml-5">정상</h3>
-                        <p class="text-sm sm:text-sm md:text-lg font-bold text-green-600" th:text="${normalState}">45</p>
+                        <p id="normalState" class="text-sm sm:text-sm md:text-lg font-bold text-green-600" th:text="${normalState}"}>45</p>
                     </div>
                     <div class="flex items-center">
                         <h3 class="text-sm sm:text-sm md:text-lg font-semibold text-gray-700 mr-1 sm:mr-2 ml-2 sm:ml-2 md:ml-5">위급</h3>
-                        <p class="text-sm sm:text-sm md:text-lg font-bold text-red-600" th:text="${emergencyState}">2</p>
+                        <p id="emergencyState" class="text-sm sm:text-sm md:text-lg font-bold text-red-600" th:text="${emergencyState}">2</p>
                     </div>
                     <div class="flex items-center">
                         <h3 class="text-sm sm:text-sm md:text-lg font-semibold text-gray-700 mr-1 sm:mr-2 ml-2 sm:ml-2 md:ml-5">점검중</h3>
-                        <p class="text-sm sm:text-sm md:text-lg font-bold text-yellow-600" th:text="${inspectionState}">3</p>
+                        <p id="inspectionState" class="text-sm sm:text-sm md:text-lg font-bold text-yellow-600" th:text="${inspectionState}">3</p>
                     </div>
                 </div>
             </div>
@@ -94,8 +89,6 @@
            class="inline-block bg-white text-red-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200">확인
         </a>
     </div>
-
-    <button onclick="blink(2)">-</button>
 
 </section>
 
@@ -138,18 +131,27 @@
         function renderMarkers(lights) {
             markers.forEach(marker => map.removeLayer(marker));
             markers = [];
+
             lights.forEach(light => {
-                const normalMarkerOptions = {
-                    color: light.state === 0 ? 'green'
-                         : light.state === 1 ? 'red'
-                            : 'brown',
-                    fillColor: light.state === 0 ? 'green'
-                             : light.state === 1 ? 'red'
-                             : 'brown',
+                let color;
+
+                if (userCode === 0) {
+                    if(light.state !== 1){
+                        return
+                    }
+                    color = 'red'
+                }else {
+                    if (light.state === 0) color = 'green';
+                    else if (light.state === 1) color = 'red';
+                    else color = 'brown';
+                }
+                const markerOption = {
+                    color: color,
+                    fillColor: color,
                     fillOpacity: 0.3,
                     radius: 7,
                 };
-                const marker = L.circleMarker([light.lat, light.lng], normalMarkerOptions)
+                const marker = L.circleMarker([light.lat, light.lng], markerOption)
                     .addTo(map)
                     .on('click', () => {
                         window.location.href = `/main/trafficLight/trafficDetail?id=${light.id.id}&cid=${light.id.cid}`;
@@ -158,6 +160,7 @@
             });
             console.log('Current markers:', markers);
         }
+
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
@@ -165,6 +168,7 @@
         async function blink(id){
             let targetLat;
             let targetLng;
+
 
             for (let i = 0; i < markers.length; i++) {
                 markers[i].setStyle({
@@ -188,14 +192,30 @@
 
             map.once("moveend", async function(){
 
-                for (let i = 0; i < markers.length; i++) {
-                    markers[i].setStyle({
+                const markerOption = {
+                    color: 'red',
+                    fillColor: 'red',
+                    fillOpacity: 0.3,
+                    radius: 7,
+                };
+                const checkMarker = markers.find(marker => {
+                    const {lat, lng} = marker.getLatLng()
+                    return lat === targetLat && lng === targetLng
+                });
+
+                if(!checkMarker){
+                    const marker = L.circleMarker([targetLat, targetLng], markerOption)
+                        .addTo(map)
+                    markers.push(marker);
+                }
+
+                markers.forEach(marker => {
+                    marker.setStyle({
                         opacity: 1,
                         fillOpacity: 0.3,
                         radius: 9
                     });
-                    console.log("markers opacity : " + markers[i].options.opacity)
-                }
+                });
 
                 for(let i=0; i<markers.length; i++){
                     const{lat, lng} = markers[i].getLatLng();
@@ -220,38 +240,18 @@
                     }
                 }
             });
-
         }
 
-        async function getEmergencyTrafficLightLoc(){
-            const response = await fetch(`${window.Config.API_BASE_URL}:8080/main/api/emergency_traffic_lights`);
-            return await response.json();  // JSON 응답 그대로 반환
-        }
-
-        /*function getTrafficLightLoc(){
-            const list = []
-            fetch(`${window.Config.API_BASE_URL}:8080/main/api/traffic_lights`)  // JSON 형태의 API 필요
+        function fetchStateCount(){
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state`)  // JSON 형태의 API 필요
                 .then(res => res.json())
                 .then(data => {
-                    list.push(data)
-                });
-            return list
-        }*/
-        async function getTrafficLightLoc(){
-            const response = await fetch(`${window.Config.API_BASE_URL}:8080/main/api/traffic_lights`);
-            return await response.json();  // JSON 응답 그대로 반환
-        }
-
-        // 주기적으로 서버에서 신호등 데이터를 받아와 갱신
-        function fetchTrafficLights() {
-            fetch(`${window.Config.API_BASE_URL}:8080/main/api/emergency_traffic_lights`)  // JSON 형태의 API 필요
-                .then(res => res.json())
-                .then(data => {
-                    renderMarkers(data);
+                    console.log(data)
+                    document.getElementById("normalState").innerText = data.safe
+                    document.getElementById("emergencyState").innerText = data.unsafe
+                    document.getElementById("inspectionState").innerText = data.inspection
                 });
         }
-
-        //setInterval(fetchTrafficLights, 5000);
 
 
 
@@ -338,9 +338,9 @@
 
             updateStateEmergency(data);
             showPopup(data);
-
-            await sleep(500);  // 1초 대기
-            blink(data.id);
+            await sleep(700);  // 1초 대기
+            fetchStateCount();
+            await blink(data.id);
         });
 
         function closePopup(){
@@ -351,10 +351,10 @@
         function showPopup(data) {
             let message = ""
             if(data.cls === 'carAccident'){
-                message = "TL00" + data.id + "에서 교통사고가 발생했습니다."
+                message = "TL00" + data.id + " 교통사고 발생"
             }
             else if(data.cls === 'fallen'){
-                message = "TL00" + data.id + "에서 낙상자가 감지되었습니다."
+                message = "TL00" + data.id + " 낙상자 발생"
             }
             document.getElementById('popupMessage').textContent = message;
             document.getElementById('emergencyHref').href = "/main/trafficLight/trafficDetail?id=" + data.id + "&cid=" + data.cid
@@ -385,9 +385,7 @@
                     console.error("서버 요청 중 오류 발생:", error);
                 });
         }
-
 </script>
-
 </main>
 </body>
 </html>

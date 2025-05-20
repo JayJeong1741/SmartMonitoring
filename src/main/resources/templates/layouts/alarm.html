@@ -52,10 +52,10 @@
         function showPopup(data) {
             let message = ""
             if(data.cls === 'carAccident'){
-                message = "TL00" + data.id + "에서 교통사고가 발생했습니다."
+                message = "TL00" + data.id + " 교통사고가 발생"
             }
             else if(data.cls === 'fallen'){
-                message = "TL00" + data.id + "에서 낙상자가 감지되었습니다."
+                message = "TL00" + data.id + " 낙상자가 발생"
             }
             document.getElementById('popupMessage').textContent = message;
             document.getElementById('emergencyHref').href = "/main/trafficLight/trafficDetail?id=" + data.id + "&cid=" + data.cid

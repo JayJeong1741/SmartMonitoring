@@ -80,6 +80,7 @@
                         <span th:text="${#temporals.format(trafficLight.lastEmergency, 'yyyy년 MM월 dd일 HH시 mm분 ss초')}">2025-01-01 00:00:00</span>
                     </p>
                     <button id="stateChange" onclick="togglePopup()" class="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">상태 변경</button>
+                    <button id="doSomething" onclick="togglePopup()" class="mt-2 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">조취</button>
                 </div>
                 <div
                         id="popupMenu"
@@ -91,6 +92,8 @@
                         </svg>
                         <h3 class="text-xl font-bold text-gray-800">상태 변경</h3>
                     </div>
+
+
                     <select
                             id="stateSelect"
                             class="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 cursor-pointer transition duration-200 hover:bg-gray-100"
@@ -218,9 +221,9 @@
             // 신호등 데이터 (위급 상태만 표시)
             L.marker([trafficData.lat,trafficData.lng], {
                 icon: L.icon({
-                    iconUrl: '../icon.png', // 마커 이미지 경로
-                    iconSize: [38, 38],         // 아이콘 크기 (가로, 세로)
-                    iconAnchor: [19, 38]        // 아이콘의 기준점 (마커의 끝점 위치)
+                    iconUrl: '../img.png', // 마커 이미지 경로
+                    iconSize: [50, 50],         // 아이콘 크기 (가로, 세로)
+                    iconAnchor: [25, 40]        // 아이콘의 기준점 (마커의 끝점 위치)
                 })
             }).addTo(map);
             L.circleMarker([trafficData.lat, trafficData.lng], {
@@ -237,7 +240,7 @@
                     color: light.state === 0 ? 'green'
                         : light.state === 1 ? 'red'
                             : 'brown',
-                    radius: 7,
+                    radius: 6,
                 };
 
                 L.circleMarker([light.lat, light.lng], markerOptions)

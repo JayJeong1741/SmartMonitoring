@@ -1,9 +1,11 @@
 package kr.mjc.jiho.smartmonitoring.controller
 
 import jakarta.servlet.http.HttpSession
+import kr.mjc.jiho.smartmonitoring.DataClass.PopulationSummary
 import kr.mjc.jiho.smartmonitoring.repository.constituency.ConstituencyRepository
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLight
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLightRepository
+import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficPopulationRepository
 import kr.mjc.jiho.smartmonitoring.repository.user.User
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Slice
@@ -22,7 +24,7 @@ data class TrafficInfo(
 @Controller
 class TrafficLightController(
     val trafficLightRepository: TrafficLightRepository,
-    private val constituencyRepository: ConstituencyRepository
+    val trafficPopulationRepository: TrafficPopulationRepository
 ) {
 
     companion object {
@@ -120,4 +122,26 @@ class TrafficLightController(
         }
 
     }
+
+    @GetMapping("/api/state")
+    @ResponseBody
+    @CrossOrigin(origins = ["*"])
+    fun returnCountOfState(@SessionAttribute user: User) : CurrentState{
+
+        try {
+            val currentState = CurrentState(trafficLightRepository.countTrafficLightNormal(user.constituencyId.id!!),
+                trafficLightRepository.countTrafficLightEmergency(user.constituencyId.id!!),
+                trafficLightRepository.countTrafficLightInspection(user.constituencyId.id!!))
+
+            return currentState
+        }catch (e:Exception){
+            return CurrentState(0,0,0)
+        }
+    }
+
+    data class CurrentState(
+        val safe:Int,
+        val unsafe:Int,
+        val inspection:Int
+    )
 }
