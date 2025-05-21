@@ -1,8 +1,8 @@
 package kr.mjc.jiho.smartmonitoring.DataClass
 
-import java.time.LocalDate
+import java.sql.Date
 
 data class PopulationSummary(
-    val day : LocalDate,
-    val totalPopulation : Int
+    val day: Date?, // NULL 가능성 대비
+    val totalPopulation: Long // decimal(32,0) 매핑
 )

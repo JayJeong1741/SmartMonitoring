@@ -2,10 +2,10 @@ package kr.mjc.jiho.smartmonitoring.controller
 
 import jakarta.servlet.http.HttpSession
 import kr.mjc.jiho.smartmonitoring.DataClass.PopulationSummary
-import kr.mjc.jiho.smartmonitoring.repository.constituency.ConstituencyRepository
+import kr.mjc.jiho.smartmonitoring.DataClass.TrafficInfo
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLight
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLightRepository
-import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficPopulationRepository
+import kr.mjc.jiho.smartmonitoring.repository.trafficPopulation.TrafficPopulationRepository
 import kr.mjc.jiho.smartmonitoring.repository.user.User
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Slice
@@ -13,13 +13,6 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
-
-data class TrafficInfo(
-    val id: Long,
-    val cid: Long,
-    val state: Int
-)
-
 
 @Controller
 class TrafficLightController(
@@ -78,6 +71,9 @@ class TrafficLightController(
                     trafficLightRepository.findClosestTrafficLights(trafficLight.lat, trafficLight.lng, id, cid)
                 )
             }
+            model.addAttribute("population",
+                trafficPopulationRepository.populationData(trafficLight.id.id, trafficLight.id.cid)
+            )
             model.addAttribute("trafficLight", trafficLight)
         }
     }

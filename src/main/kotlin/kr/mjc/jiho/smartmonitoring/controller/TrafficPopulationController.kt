@@ -1,7 +1,7 @@
 package kr.mjc.jiho.smartmonitoring.controller
 
-import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficPopulation
-import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficPopulationRepository
+import kr.mjc.jiho.smartmonitoring.repository.trafficPopulation.TrafficPopulation
+import kr.mjc.jiho.smartmonitoring.repository.trafficPopulation.TrafficPopulationRepository
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
 

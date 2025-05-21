@@ -1,9 +1,8 @@
-package kr.mjc.jiho.smartmonitoring.repository.trafficlight
+package kr.mjc.jiho.smartmonitoring.repository.trafficPopulation
 
 import jakarta.persistence.EmbeddedId
 import jakarta.persistence.Entity
 import jakarta.persistence.Table
-import java.time.LocalDateTime
 
 
 @Entity

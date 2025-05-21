@@ -17,6 +17,7 @@
             <!-- 탭 메뉴 및 콘텐츠 -->
             <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-md">
                 <div class="flex border-b border-gray-200">
+
                     <button class="tab-button px-4 py-2 text-gray-600 font-medium focus:outline-none active text-blue-600 border-b-2 border-blue-600" data-tab="video">📹 실시간 영상</button>
                     <button class="tab-button px-4 py-2 text-gray-600 font-medium focus:outline-none" data-tab="map">📍 신호등 위치</button>
                 </div>
@@ -144,6 +145,12 @@
         // 탭 메뉴 스크립트
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabPanes = document.querySelectorAll('.tab-pane');
+        const population = [[${population}]]
+
+        console.log("population:" + JSON.stringify(population))
+
+        const day = population.map(item => item.day);
+        const populationData = population.map(item => item.totalPopulation);
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -326,7 +333,7 @@
 
             console.log("Json 정보:", trafficInfo);
 
-            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state_update`, {
+            fetch(`${window.Config.API_BASE_URL}:59727/main/api/state_update`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -348,10 +355,10 @@
         const trafficChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['4월 30일', '5월 1일', '5월 2일', '5월 3일', '5월 4일', '5월 5일', '5월 6일'],
+                labels: day,
                 datasets: [{
                     label: '통행인구 ( 최근 일주일 )',
-                    data: [120, 150, 130, 180, 160, 170, 200],
+                    data: populationData,
                     borderColor: 'red',
                     borderWidth: 2,
                     fill: false

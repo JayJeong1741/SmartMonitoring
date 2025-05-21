@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "smartmonitoring-d728d",
+  "private_key_id": "cdf3e06c283d540cf2ee1e45ff8ebcd315d42ef5",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDJpX+ph8xlbT7l\nvz4J/ozeUMdgmF9eebpaN/y2g+VNcR44HMXLZZKOR42AyQTE1oa3sSiXlcN4oVXJ\nwB2E9NsHTBr+52hw9UNTL44SpoiwEKkfN0IJW5hpWOdoU7hzLP6ByWHdEQZQG0Ig\nWRbMQQjyQdayaxQE8CPEuEvySWe/VmYoSFxaom9zZas8uuOpCsuI9KMMskY4p1vO\nHT/+T+q/HrAk6qaNyU1H6mxFvx9jFrBUlMYGa8qGmw2DDW9KuwGAH10psOZzbgm9\nkL6mXVHhu/w7hrWqzknm28gToVeEzARIhinX7fstOFdDGGVMSblywSRKzmmrJGNm\nKV+bdnkLAgMBAAECggEAAiKErs2WrN1GwLjh+Wu+wVEN74hXjRYIuvzy9zHQfuEi\nLjD0bGUcNv9ogxxGIrQzXNJlfhhMfx9YQLHfGsRa+bQDW0JbZ4Butp5g2XliM7cz\ni5gqOZrSYoaCK2q/fhCrucGd5XeHJik6dF0dGJ+M581flsmPiMAqUMdVCkvl0C+L\nHHm0I5qQfN0ibqkVyQ7QCHDQnjg5esWJjFxk1nH4XqzInYQ3HGUG1tcuyhFh1EQk\n+3ah0N/JgC3ViyCzrFsrlHQVTEXEuiP+LgyPzjOGPrV+Yaa04RF4+6/TB4iN1O4g\n+wnX8pOOy6AP/7LAeQboaXV9mx3YjLbZgIugsyagEQKBgQDxQWRd4IsDD8drgrbK\nZ+Q1a/fNDlD5iKZcrk8GBcrh1V7+gvMHS58IElFGnYsw/BEn2vbiPrsOyc5Zr5ru\n20Gk7sfbHBb4/9l3ZnMBMEbpRqskpQAd7TnMnvMD1z/RNg6k5S1GgyEBH8vNwkrb\n5/k5nEH/Ij5qLApQpSJSblw4EwKBgQDV+GWpIjuqCqnUdE4nQtVI2U97D7iVCz9P\neoNt1wPjrpS1snBU8zwMq+jmvoeWVND9qGJJfAZ3M3sv3mzxkXnj3MrP93Vmj+s3\nnnCxeFq3FrSghUnAbbxHfWbcg3Pgckp78yuqm+G7/+cN1Z6njawcgrN0jVXiPTO0\nQGgiJxRKKQKBgFI5NzvHi5k/h3fc1O+m+OA8K/h3KKHjMM/lmIk08DCHyBh2CN4z\np7/YflrS1t2bCz3KItp5BsfDf9CRSPyfPYA44WSL7khu6m8HO6rsCT74FtwmYCPS\n9iAHDEwC0H09L0CD2yptBpKbg5pc3aaVKRu5ZcTOpvcIi3twzIHLmyKBAoGBANDv\nlH2aov5BGWMPCv3FgjV3legKCujnKbQ3Yr1QF0ktwaLHEm+xcDLDb1JaPFXsjoMS\n+J7fEAU37RNqM6GTt51sjVKURjyXTk1qVorFhneAIXMZlFHmFdMNPfMYHX/OurLc\nWghn3P5SPVHCBgGBEs5oRkoKdRHNR3684bJvzJ05AoGBALOPRlQiyPf8ojNsd/I9\nUk906nn9y3QbXdbRlxiUIj1utx52xb5cBhuvXR1zgJ2CU3xgkSo1VASCpJLYodep\nrz8JFf8USZXgcP3gWYvE9gHHT3a7GNZ73wF1vbB0qVjiHMrqOtsWLyhIkAxZ7Mmh\nrc6mz0Ma01nvm8Grl0fh9gV4\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-fbsvc@smartmonitoring-d728d.iam.gserviceaccount.com",
+  "client_id": "117131847087430790857",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40smartmonitoring-d728d.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
