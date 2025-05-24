@@ -3,12 +3,12 @@ package kr.mjc.jiho.smartmonitoring.controller
 import jakarta.servlet.http.HttpSession
 import kr.mjc.jiho.smartmonitoring.repository.user.User
 import kr.mjc.jiho.smartmonitoring.repository.user.UserRepository
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
-import java.time.LocalDateTime
 
 
 @Controller
@@ -23,7 +23,7 @@ class UserController(val userRepository: UserRepository,
     fun pass(){}
 
 
-    @PostMapping("/user/login")
+    /*@PostMapping("/user/login")
     fun login(@RequestParam("username") username:String,
               @RequestParam("password") password:String, session: HttpSession):String{
         val user = userRepository.findByUsername(username)
@@ -38,13 +38,13 @@ class UserController(val userRepository: UserRepository,
     @GetMapping("/user/login")
     fun login():String{
         return "redirect:/"
-    }
+    }*/
 
-    @PostMapping("/user/logout")
+    /*@PostMapping("/user/logout")
     fun logout(session: HttpSession):String{
         session.invalidate()
         return "redirect:/"
-    }
+    }*/
     @PostMapping("/user/signup")
     fun signup(user: User, session: HttpSession): String {
         val exists = userRepository.existsByUsername(user.username)

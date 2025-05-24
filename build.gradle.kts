@@ -46,6 +46,8 @@ dependencies {
 
     implementation ("com.google.protobuf:protobuf-java:3.25.5")
     implementation ("com.google.firebase:firebase-admin:9.4.3")
+
+    implementation ("org.springframework.boot:spring-boot-starter-security")
 }
 
 kotlin {

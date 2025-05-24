@@ -16,16 +16,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @ServletComponentScan
 @EnableScheduling
 class SmartMonitoringApplication : WebMvcConfigurer {
-    @Bean
-    fun passwordEncoder() = BCryptPasswordEncoder()
-
-    @Autowired lateinit var authInterceptor: AuthInterceptor
 
 
-    override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(authInterceptor)
-            .addPathPatterns("/trafficLight/dashboard", "/trafficLight/trafficList", "/trafficLight/trafficDetail")
-    }
 }
 
 

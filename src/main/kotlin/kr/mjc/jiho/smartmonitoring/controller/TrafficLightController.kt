@@ -61,7 +61,7 @@ class TrafficLightController(
     }
 
     @GetMapping("/trafficLight/trafficDetail")
-    fun trafficDetail(id: Long,cid:Long, model: Model) {
+    fun trafficDetail(id: Long, cid:Long, model: Model) {
 
         val trafficLight : TrafficLight? =trafficLightRepository.findByIdCid(id, cid)
 
