@@ -243,7 +243,7 @@
         }
 
         function fetchStateCount(){
-            fetch(`${window.Config.API_BASE_URL}:59727/main/api/state`)  // JSON 형태의 API 필요
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state`)  // JSON 형태의 API 필요
                 .then(res => res.json())
                 .then(data => {
                     console.log(data)
@@ -317,7 +317,7 @@
         siren.muted = true;
 
 
-        const socket = io(`${window.Config.API_BASE_URL}:59726`, {
+        const socket = io(`${window.Config.API_BASE_URL}:3000`, {
             withCredentials: true,
             transports: ["websocket", "polling"]
         });
@@ -370,7 +370,7 @@
 
             console.log("Json 정보:", trafficInfo);
 
-            fetch(`${window.Config.API_BASE_URL}:59727/main/api/state_update`, {
+            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state_update`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

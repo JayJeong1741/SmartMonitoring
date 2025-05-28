@@ -46,6 +46,7 @@ class SecurityConfig(private val loginSuccessHandler: LoginSuccessHandler,
                     .authenticationSuccessHandler(rememberMeAuthenticationSuccessHandler)
             }
             .addFilterBefore(RedirectAuthenticatedUserFilter(), DefaultLoginPageGeneratingFilter::class.java)
+            .csrf{csrf -> csrf.disable()};
 
         return http.build()
     }
