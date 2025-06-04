@@ -1,5 +1,8 @@
 package kr.mjc.jiho.smartmonitoring.repository.trafficlight
 
+import kr.mjc.jiho.smartmonitoring.DataClass.LastEmergencyDto
+import kr.mjc.jiho.smartmonitoring.DataClass.TrafficLightDto
+import kr.mjc.jiho.smartmonitoring.DataClass.TrafficLightLoc
 import kr.mjc.jiho.smartmonitoring.controller.TrafficLightController
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
@@ -9,30 +12,7 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
-import java.sql.Timestamp
 import java.time.LocalDateTime
-
-data class TrafficLightDto(
-    val sName: String,
-    val emergencyCount: Int
-)
-
-data class LastEmergencyDto(
-    val id : Long,
-    val cid: Long,
-    val sName: String,
-    val lastEmergency:Timestamp
-)
-
-data class TrafficLightLoc(
-    val id: Long,
-    val cid: Long,
-    val lat: BigDecimal,
-    val lng: BigDecimal,
-    val sName:String,
-    val state: Int,
-    val distance: Double
-)
 
 
 interface TrafficLightRepository : JpaRepository<TrafficLight, Long> {
@@ -110,24 +90,9 @@ CASE
                (6371 * ACOS(SIN(RADIANS(:targetLat)) * SIN(RADIANS(lat)) +
                             COS(RADIANS(:targetLat)) * COS(RADIANS(lat)) * COS(RADIANS(lng) - RADIANS(:targetLon)))) AS distance
         FROM traffic_light
-        WHERE id != :id AND cid = :cid
+        WHERE NOT id = :id AND cid = :cid
         ORDER BY distance
         LIMIT 3""", nativeQuery = true)
-    fun findClosestTrafficLights(targetLat: BigDecimal, targetLon: BigDecimal, id:Long, cid: Long): List<TrafficLightLoc>
+    fun findClosestTrafficLights(targetLat: BigDecimal, targetLon: BigDecimal, id:Long, cid:Long): List<TrafficLightLoc>
 
-
-    @Query("""
-    SELECT *,
-           (6371 * ACOS(SIN(RADIANS(:targetLat)) * SIN(RADIANS(lat)) +
-                        COS(RADIANS(:targetLat)) * COS(RADIANS(lat)) * COS(RADIANS(lng) - RADIANS(:targetLon)))) AS distance
-    FROM traffic_light
-    WHERE cid = :cid
-    HAVING distance <= 0.3
-    ORDER BY distance
-""", nativeQuery = true)
-    fun findTrafficLightsWithin300m(
-        targetLat: BigDecimal,
-        targetLon: BigDecimal,
-        cid: Long
-    ): List<TrafficLight>?
 }

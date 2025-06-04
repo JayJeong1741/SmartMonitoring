@@ -1,5 +1,6 @@
-package kr.mjc.jiho.smartmonitoring.fcm
+package kr.mjc.jiho.smartmonitoring.controller
 
+import kr.mjc.jiho.smartmonitoring.fcm.FCMService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping

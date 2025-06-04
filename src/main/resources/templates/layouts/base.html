@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.10.3/cdn.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -22,7 +21,7 @@
 </head>
 <body class="bg-gray-100 font-sans">
 <!-- 네비게이션 바 -->
-<nav class="bg-white shadow-lg fixed w-full z-50">
+<nav class="bg-white shadow-lg fixed w-full z-50 pt-7 md:pt-0">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- 로고 -->
@@ -55,13 +54,15 @@
                     <div class="py-2 px-3">
                         <a th:href="@{/trafficLight/dashboard}" class="block py-2 text-gray-600 hover:text-blue-500 font-semibold">대시보드</a>
                         <a th:href="@{/trafficLight/trafficList}" class="block py-2 text-gray-600 hover:text-blue-500">신호등 목록</a>
-                        <form th:action="@{/user/logout}" method="post"><button type="submit" class="block w-full text-left py-2 text-gray-600 hover:text-blue-500">로그아웃</button></form>
+                        <form th:action="@{/logout}" method="post"><button type="submit" class="block w-full text-left py-2 text-gray-600 hover:text-blue-500">로그아웃</button></form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </nav>
-<main th:replace="${main}"></main>
+<div class="pt-6 md:pt-0">
+    <main th:replace="${main}"></main>
+</div>
 </body>
 </html>

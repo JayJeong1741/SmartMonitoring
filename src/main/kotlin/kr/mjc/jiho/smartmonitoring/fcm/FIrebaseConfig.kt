@@ -12,8 +12,8 @@ import javax.annotation.PostConstruct
 class FirebaseConfig {
     @PostConstruct
     fun initialize() {
-        /*try {
-            val serviceAccount = FileInputStream("src/main/resources/firebase-service-account.json")
+        try {
+            val serviceAccount = FileInputStream("src/main/resources/fcmtest-bc925-firebase-adminsdk-fbsvc-04bb36c9cf.json")
 
             val options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials.fromStream(serviceAccount))
@@ -24,7 +24,7 @@ class FirebaseConfig {
             }
         } catch (e: Exception) {
             e.printStackTrace()
-        }*/
+        }
     }
 }
 

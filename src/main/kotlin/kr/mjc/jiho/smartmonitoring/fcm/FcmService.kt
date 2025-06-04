@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service
 class FCMService {
     fun sendNotification(targetToken: String?, title: String?, body: String?): String {
         return try {
+            if (targetToken.isNullOrEmpty()) {
+                throw IllegalArgumentException("Target token must not be null or empty")
+            }
             val notification = Notification.builder()
                 .setTitle(title)
                 .setBody(body)

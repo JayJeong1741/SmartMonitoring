@@ -3,6 +3,7 @@ package kr.mjc.jiho.smartmonitoring.controller
 import jakarta.servlet.http.HttpSession
 import kr.mjc.jiho.smartmonitoring.DataClass.PopulationSummary
 import kr.mjc.jiho.smartmonitoring.DataClass.TrafficInfo
+import kr.mjc.jiho.smartmonitoring.repository.fcmDevices.FcmDevicesRepository
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLight
 import kr.mjc.jiho.smartmonitoring.repository.trafficlight.TrafficLightRepository
 import kr.mjc.jiho.smartmonitoring.repository.trafficPopulation.TrafficPopulationRepository
@@ -17,7 +18,8 @@ import java.time.LocalDateTime
 @Controller
 class TrafficLightController(
     val trafficLightRepository: TrafficLightRepository,
-    val trafficPopulationRepository: TrafficPopulationRepository
+    val trafficPopulationRepository: TrafficPopulationRepository,
+    val fcmDevicesRepository: FcmDevicesRepository
 ) {
 
     companion object {
@@ -68,13 +70,15 @@ class TrafficLightController(
         if (trafficLight != null) {
             if(trafficLight.lat != null && trafficLight.lng != null) {
                 model.addAttribute("nearestLoc",
-                    trafficLightRepository.findClosestTrafficLights(trafficLight.lat, trafficLight.lng, id, cid)
+                    trafficLightRepository.findClosestTrafficLights(trafficLight.lat, trafficLight.lng, trafficLight.id.id, trafficLight.id.cid)
                 )
+                model.addAttribute("nearestWorker", fcmDevicesRepository.findClosestWorker(trafficLight.lat, trafficLight.lng))
             }
             model.addAttribute("population",
                 trafficPopulationRepository.populationData(trafficLight.id.id, trafficLight.id.cid)
             )
             model.addAttribute("trafficLight", trafficLight)
+
         }
     }
 
@@ -98,7 +102,6 @@ class TrafficLightController(
 
         return cid?.let { trafficLightRepository.findTrafficLightLOC(it) }
     }
-
 
     @PostMapping("/api/state_update")
     @ResponseBody

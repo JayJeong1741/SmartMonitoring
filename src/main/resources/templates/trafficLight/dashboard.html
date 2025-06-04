@@ -243,7 +243,7 @@
         }
 
         function fetchStateCount(){
-            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state`)  // JSON 형태의 API 필요
+            fetch(`${window.Config.API_BASE_URL}:${window.Config.SPRING_BASE_PORT}/main/api/state`)  // JSON 형태의 API 필요
                 .then(res => res.json())
                 .then(data => {
                     console.log(data)
@@ -310,14 +310,16 @@
     });
 
         window.Config = {
-            API_BASE_URL: [[${@environment.getProperty('api.base.url')}]]
+            API_BASE_URL: [[${@environment.getProperty('api.base.url')}]],
+            SOCKET_BASE_PORT: [[${@environment.getProperty('socket.base.port')}]],
+            SPRING_BASE_PORT: [[${@environment.getProperty('spring.base.port')}]]
         };
 
         const siren = new Audio('../siren.mp3');
         siren.muted = true;
 
 
-        const socket = io(`${window.Config.API_BASE_URL}:3000`, {
+        const socket = io(`${window.Config.API_BASE_URL}:${window.Config.SOCKET_BASE_PORT}`, {
             withCredentials: true,
             transports: ["websocket", "polling"]
         });
@@ -370,7 +372,7 @@
 
             console.log("Json 정보:", trafficInfo);
 
-            fetch(`${window.Config.API_BASE_URL}:8080/main/api/state_update`, {
+            fetch(`${window.Config.API_BASE_URL}:${window.Config.SPRING_BASE_PORT}/main/api/state_update`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
