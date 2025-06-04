@@ -20,6 +20,12 @@ class FCMController {
         @RequestParam title: String?,
         @RequestParam body: String?
     ): String {
-        return fcmService!!.sendNotification(token, title, body)
+        try {
+            return fcmService!!.sendNotification(token, title, body)
+        }catch (e:Exception){
+            println(e)
+            return e.message!!
+        }
+
     }
 }
