@@ -15,7 +15,7 @@ interface FcmDevicesRepository : JpaRepository<FcmDevices, Long> {
 
 
     @Query("SELECT t FROM FcmDevices t WHERE t.deviceName = :deviceName and t.deviceId = :deviceId")
-    fun findByDeviceNameId(deviceId: String, deviceName: String): FcmDevices?
+    fun findByDeviceNameIdToken(deviceId: String, deviceName: String, fcmToken: String): FcmDevices?
 
 
     @Modifying
@@ -30,9 +30,9 @@ interface FcmDevicesRepository : JpaRepository<FcmDevices, Long> {
 
     @Modifying
     @Transactional
-    @Query("INSERT INTO fcm_devices (device_id, device_name, fcm_token, lat, lng, last_updated_at) VALUES (:deviceId, :deviceName, :fcmToken, :lat, :lng, CURRENT_TIMESTAMP)",
+    @Query("INSERT INTO fcm_devices (device_id, device_name, fcm_token, last_updated_at, state) VALUES (:deviceId, :deviceName, :fcmToken, CURRENT_TIMESTAMP, :state)",
         nativeQuery = true)
-    fun insertNewFcmDevice(deviceId: String, deviceName: String, fcmToken: String, lat:BigDecimal, lng:BigDecimal)
+    fun insertNewFcmDevice(deviceId: String, deviceName: String, fcmToken: String, state:Int)
 
 
     @Query("""
@@ -44,8 +44,14 @@ interface FcmDevicesRepository : JpaRepository<FcmDevices, Long> {
          ), 2
        ) AS distance
         FROM fcm_devices
+        where state = 1
         HAVING distance <= 3.0
         ORDER BY distance
         LIMIT 3""", nativeQuery = true)
     fun findClosestWorker(targetLat: BigDecimal, targetLon: BigDecimal): List<NearestWorkerDto>
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE FcmDevices t SET t.state = :state WHERE t.deviceId = :deviceId AND t.deviceName = :deviceName AND t.fcmToken = :fcmToken")
+    fun updateState(deviceId: String, deviceName: String ,state: Int, fcmToken: String): Int
 }

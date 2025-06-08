@@ -1,6 +1,5 @@
 package kr.mjc.jiho.smartmonitoring
 
-import kr.mjc.jiho.smartmonitoring.Interceptor.AuthInterceptor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

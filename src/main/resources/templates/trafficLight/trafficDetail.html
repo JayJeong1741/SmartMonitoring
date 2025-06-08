@@ -117,18 +117,23 @@
                         <h3 class="text-xl font-bold text-gray-800">인근 현장근무자</h3>
                     </div>
                     <div class="max-w-xl mx-auto mt-6">
-                        <ul th:each="nearestWorker : ${nearestWorker}" class="space-y-4">
-                            <li class="flex items-center justify-between border border-gray-300 bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow mt-2">
-                                <div class="flex flex-col text-sm sm:text-base">
-                                    <span class="font-semibold text-gray-700" th:text="|근무자: ${nearestWorker.deviceName}|"></span>
-                                    <span class="text-gray-500 mt-1" th:text="|거리: ${nearestWorker.distance} Km|"></span>
-                                </div>
-                                <button th:attr="onclick='fcmAlarm(\'' + ${nearestWorker.fcmToken} + '\')'"
-                                        class="ml-4 whitespace-nowrap bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors shadow">
-                                    호출
-                                </button>
-                            </li>
-                        </ul>
+                        <div>
+                            <ul th:each="nearestWorker : ${nearestWorker}" class="space-y-4">
+                                <li class="flex items-center justify-between border border-gray-300 bg-white shadow-md rounded-xl p-4 hover:shadow-lg transition-shadow mt-2">
+                                    <div class="flex flex-col text-sm sm:text-base">
+                                        <span class="font-semibold text-gray-700" th:text="|근무자: ${nearestWorker.deviceName}|"></span>
+                                        <span class="text-gray-500 mt-1" th:text="|거리: ${nearestWorker.distance} Km|"></span>
+                                    </div>
+                                    <button th:attr="onclick='fcmAlarm(\'' + ${nearestWorker.fcmToken} + '\')'"
+                                            class="ml-4 whitespace-nowrap bg-blue-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-colors shadow">
+                                        호출
+                                    </button>
+                                </li>
+                            </ul>
+                            <div th:if="${nearestWorker == null or nearestWorker.isEmpty()}" class="text-center text-gray-500 mt-4">
+                                근무 중인 근무자가 없습니다
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -390,8 +395,9 @@
         function fcmAlarm(fcmToken){
 
             const fcmDeviceInfo = new URLSearchParams();
+
             fcmDeviceInfo.append("token", fcmToken);
-            fcmDeviceInfo.append("title", "위급상활 발생");
+            fcmDeviceInfo.append("title", "TL00"+trafficData.id+"에서 위급상활 발생");
             fcmDeviceInfo.append("body", "현장을 확인해주세요.");
 
             fetch(`${window.Config.API_BASE_URL}:${window.Config.SPRING_BASE_PORT}/main/api/fcm/send`, {
