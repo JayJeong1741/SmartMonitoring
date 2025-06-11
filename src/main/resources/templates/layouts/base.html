@@ -21,23 +21,23 @@
 </head>
 <body class="bg-gray-100 font-sans">
 <!-- 네비게이션 바 -->
-<nav class="bg-white shadow-lg fixed w-full z-50 pt-7 md:pt-0">
+<nav class="bg-white shadow-lg fixed w-full z-50 pt-7 lg:pt-0">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <!-- 로고 -->
             <div class="flex items-center">
-                <h1 class="text-xl md:text-2xl font-extrabold text-gray-800">스마트 모니터링</h1>
+                <h1 class="text-xl lg:text-2xl font-extrabold text-gray-800">스마트 모니터링</h1>
             </div>
 
-            <!-- 데스크톱 메뉴 (중간 크기 이상에서만 표시) -->
-            <div class="hidden md:flex items-center space-x-4">
+            <!-- 데스크톱 메뉴 (lg 크기 이상에서만 표시) -->
+            <div class="hidden lg:flex items-center space-x-4">
                 <a th:href="@{/trafficLight/dashboard}" class="text-gray-600 hover:text-blue-500 font-semibold">대시보드</a>
                 <a th:href="@{/trafficLight/trafficList}" class="text-gray-600 hover:text-blue-500">신호등 목록</a>
                 <form th:action="@{/logout}" method="post"><button type="submit" class="text-gray-600 hover:text-blue-500">로그아웃</button></form>
             </div>
 
-            <!-- 모바일 메뉴 버튼 (중간 크기 미만에서만 표시) -->
-            <div class="md:hidden flex items-center" x-data="{ open: false }">
+            <!-- 모바일 메뉴 버튼 (lg 크기 미만에서만 표시) -->
+            <div class="lg:hidden flex items-center" x-data="{ open: false }">
                 <button @click="open = !open" class="text-gray-500 hover:text-gray-600 focus:outline-none">
                     <!-- 햄버거 아이콘 -->
                     <svg class="h-6 w-6" x-show="!open" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -61,7 +61,7 @@
         </div>
     </div>
 </nav>
-<div class="pt-6 md:pt-0">
+<div class="pt-6 lg:pt-0">
     <main th:replace="${main}"></main>
 </div>
 </body>
