@@ -25,11 +25,6 @@ interface FcmDevicesRepository : JpaRepository<FcmDevices, Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE FcmDevices t SET t.fcmToken = :fcmToken WHERE t.deviceId = :deviceId AND t.deviceName = :deviceName")
-    fun updateFcmToken(deviceId: String, deviceName: String, fcmToken: String)
-
-    @Modifying
-    @Transactional
     @Query("INSERT INTO fcm_devices (device_id, device_name, fcm_token, last_updated_at, state) VALUES (:deviceId, :deviceName, :fcmToken, CURRENT_TIMESTAMP, :state)",
         nativeQuery = true)
     fun insertNewFcmDevice(deviceId: String, deviceName: String, fcmToken: String, state:Int)

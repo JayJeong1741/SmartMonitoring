@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html th:replace="~{layouts/base::html(main=~{::main})}" xmlns="http://www.w3.org/1999/html"> lang="ko">
+<html th:replace="~{layouts/base::html(main=~{::main})}" xmlns="http://www.w3.org/1999/html" lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,82 +7,84 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 font-sans">
-
 <main>
-<!-- 네비게이션 바 -->
-
-
-<!-- 신호등 목록 -->
-<section class="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center mb-6">
-        <h2 class=" text-2xl font-bold text-gray-800">신호등 목록</h2>
-        <div class="relative">
-            <input type="text" id="search" placeholder="신호등 ID 또는 위치 검색" class="pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <span class="absolute left-3 top-2.5 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></span>
-        </div>
-    </div>
-    <div id="trafficList" class="space-y-4">
-
-
-        <div th:each="trafficLight : ${trafficLights}" class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 mb-4">
-
-            <a th:href="@{/trafficLight/trafficDetail(id=${trafficLight.id.id},cid=${trafficLight.id.cid})}" class="text-blue-500 hover:bg-gray-100 font-semibold">
-            <div class="flex items-center justify-between">
-                <div class="flex-1">
-                    <span th:text="|TL00${trafficLight.id.id}|"></span>
-                </div>
-                <div class="flex-1 text-gray-600">
-                    <span th:text="${trafficLight.sName}">광화문</span>
-                </div>
-
-                <div th:if="${trafficLight.state}==0" class="flex-1">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                        정상
-                    </span>
-                </div>
-
-                <div th:if="${trafficLight.state}==1" class="flex-1">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
-                        </svg>
-                        위급
-                    </span>
-                </div>
-
-                <div th:if="${trafficLight.state}==2" class="flex-1">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
-                        </svg>
-                        점검
-                    </span>
-                </div>
-
+    <section class="pt-20 pb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">신호등 목록</h2>
+            <div class="relative">
+                <input type="text" id="search" placeholder="신호등 ID 또는 위치 검색" class="pl-10 pr-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <span class="absolute left-3 top-2.5 text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></span>
             </div>
-            </a>
         </div>
-        <div th:replace="~{layouts/pagenation::p}"></div>
-    </div>
-</section>
+        <div id="trafficList" class="space-y-4">
+            <div th:each="trafficLight : ${trafficLights}" class="traffic-item bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200 mb-4">
+                <a th:href="@{/trafficLight/trafficDetail(id=${trafficLight.id.id},cid=${trafficLight.id.cid})}" class="text-blue-500 hover:bg-gray-100 font-semibold">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1">
+                            <span th:text="|TL00${trafficLight.id.id}|" class="traffic-id"></span>
+                        </div>
+                        <div class="flex-1 text-gray-600">
+                            <span th:text="${trafficLight.sName}" class="traffic-location">광화문</span>
+                        </div>
+                        <div th:if="${trafficLight.state}==0" class="flex-1">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                정상
+                            </span>
+                        </div>
+                        <div th:if="${trafficLight.state}==1" class="flex-1">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86A2.07 2.07 0 0021 16.93V7.07A2.07 2.07 0 0018.93 5H5.07A2.07 2.07 0 003 7.07v9.86A2.07 2.07 0 005.07 19z"/>
+                                </svg>
+                                위급
+                            </span>
+                        </div>
+                        <div th:if="${trafficLight.state}==2" class="flex-1">
+                            <span class="inline-flex items-center px-2 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
+                                </svg>
+                                점검
+                            </span>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div th:replace="~{layouts/pagenation::p}"></div>
+        </div>
+    </section>
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <<div th:replace="~{layouts/alarm :: socketAlarm}"></div>
+    <div th:replace="~{layouts/alarm :: socketAlarm}"></div>
 
-<script>
-    // 검색 기능 (클라이언트 측 필터링 예시)
-    document.getElementById('search').addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        const rows = document.querySelectorAll('#trafficList > div');
-        rows.forEach(row => {
-            const id = row.querySelector('a').textContent.toLowerCase();
-            const location = row.querySelector('div:nth-child(2)').textContent.toLowerCase();
-            row.style.display = (id.includes(query) || location.includes(query)) ? '' : 'none';
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.getElementById('search');
+            if (!searchInput) {
+                console.error('검색 입력 요소(#search)를 찾을 수 없습니다.');
+                return;
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+                const rows = document.querySelectorAll('#trafficList .traffic-item');
+                console.log(`검색어: ${query}, 항목 수: ${rows.length}`);
+                rows.forEach(row => {
+                    const idElement = row.querySelector('.traffic-id');
+                    const locationElement = row.querySelector('.traffic-location');
+                    if (!idElement || !locationElement) {
+                        console.error('ID 또는 위치 요소를 찾을 수 없습니다.', row);
+                        return;
+                    }
+                    const id = idElement.textContent.toLowerCase();
+                    const location = locationElement.textContent.toLowerCase();
+                    row.style.display = (id.includes(query) || location.includes(query)) ? '' : 'none';
+                });
+            });
         });
-    });
-</script>
+    </script>
 </main>
 </body>
 </html>
